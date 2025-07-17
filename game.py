@@ -79,39 +79,28 @@ def main():
     player.inventory = Inventory()
     print()
     print("SHABUYA")
-    play_choice = ""
-    while play_choice not in ["y", "n"]:
-        print()
-        play_choice = input("Would you like to play?  (Y)es or (N)? ").strip().lower()
-        if play_choice not in ["y", "n"]:
-            print("Please enter 'Y' or 'N'.")
-    if play_choice == "n":
-        print("Maybe next time!")
-        return
-    print()
     print("Choose your class:")
     print("1: Rogue")
     print("2: Warrior")
     print("3: Mage")
-    class_choice = ""
-    while class_choice not in ["1", "2", "3"]:
-        class_choice = input().strip()
-        if class_choice not in ["1", "2", "3"]:
-            print("Invalid choice. Please enter 1, 2, or 3.")
+    class_choice = input("Enter the number of your class: ").strip()
     if class_choice == "1":
         player.weapon = dagger
-        print()
         print("You are a Rogue. You start with a Dagger.")
     elif class_choice == "2":
         player.weapon = axe
-        print()
         print("You are a Warrior. You start with an Axe.")
     elif class_choice == "3":
         player.weapon = wand
-        print()
         print("You are a Mage. You start with a Wand.")
+    else:
+        print("Invalid choice. Defaulting to Rogue.")
+        player.weapon = dagger
+        print("You are a Rogue. You start with a Dagger.")
     scenes = setup_scenes()
     current_scene = scenes["Cave Entrance"]
+    visited_village = False
+    rogue_escaped_alley = False
     while True:
         if current_scene.name == "Cave Entrance":
             first_cave = True
@@ -152,58 +141,122 @@ def main():
                 else:
                     print()
                     print("Invalid option.")
-        elif current_scene.name == "Skull Chamber":
+        elif current_scene.name == "Alley":
             print()
-            current_scene.enter(player)
-            print()
-            print("You see a distant figure scurry away among the shadows near the giant skull.")
-            print("Would you like to chase after it?")
-            print("1: Yes")
-            print("2: No")
-            print("Type 'quit' to exit.")
-            chase_choice = input("Choose an option: ").strip().lower()
-            if chase_choice == "quit":
+            if rogue_escaped_alley and player.weapon == dagger:
+                print("You return to the alley, now aware of the lurking enemy. You have the chance to sneak up and ambush it.")
                 print()
-                print("Thanks for playing!")
-                break
-            elif chase_choice == "1":
-                print()
-                print("You run after the moving figure, following its fleeting shadow through the chamber. You are led straight into the primitive village.")
-                current_scene = scenes.get("Primitive Village")
-                continue
-            elif chase_choice == "2":
-                print()
-                print("You decide not to chase after it and remain cautious.")
-                print("Suddenly, a rockfall blocks the path behind you! There is only one way forward now.")
-                # Restrict exits to only 'forward'
-                current_scene.exits = {"forward": "Primitive Village"}
-                while True:
+                print("What do you do?")
+                print("1: Sneak up and ambush the creature")
+                print("2: Return to the village")
+                print("Type 'quit' to exit.")
+                choice = input("Choose an option: ").strip().lower()
+                if choice == "quit":
                     print()
-                    print("You can only move forward now.")
-                    print("1: Move forward")
-                    print("Type 'quit' to exit.")
-                    cmd = input("Choose an option: ").strip().lower()
-                    if cmd == "quit":
-                        print()
-                        print("Thanks for playing!")
-                        return
-                    elif cmd == "1":
-                        next_scene = scenes.get("Primitive Village")
-                        if next_scene:
-                            current_scene = next_scene
-                            break
-                        else:
-                            print("That exit doesn't lead anywhere.")
+                    print("Thanks for playing!")
+                    break
+                elif choice == "1":
+                    print()
+                    print("You move silently through the shadows and ambush the creature. It never saw you coming and is slain instantly.")
+                    print("You feel a surge of power as you level up!")
+                    player.level_up()
+                    if hasattr(player, 'attribute_points') and player.attribute_points >= 3:
+                        print("Allocate your 3 stat points:")
+                        for i in range(3):
+                            print(f"Point {i+1} - Choose: vitality, agility, strength, intelligence")
+                            stat = input("Attribute: ").strip().lower()
+                            from enemy import allocate_attribute
+                            allocate_attribute(player, stat)
+                    print()
+                    loot_choice = input("Would you like to loot the corpse? (y/n): ").strip().lower()
+                    if loot_choice == "y":
+                        print("You search the corpse and find a rusty key labeled 'Armory Key'.")
+                        from item import Item
+                        armory_key = Item("Armory Key", "A rusty key that opens the armory.")
+                        player.inventory.add_item(armory_key)
                     else:
-                        print()
-                        print("Invalid option.")
-                continue
+                        print("You leave the corpse untouched and return to the village.")
+                    print()
+                    print("You return to the village, emboldened by your victory.")
+                    current_scene = scenes.get("Primitive Village")
+                elif choice == "2":
+                    print()
+                    print("You decide not to risk it and return to the village.")
+                    current_scene = scenes.get("Primitive Village")
+                else:
+                    print("Invalid option.")
             else:
+                print("You step into the alley. The shadows seem to move, and suddenly a primitive ground-dwelling creature emerges from a burrow. Its skin is mottled and tough, eyes glinting with hunger. It blocks your path, brandishing a crude club and snarling.")
                 print()
-                print("Invalid option.")
-        elif current_scene.name == "Primitive Village":
+                print("What do you do?")
+                print(f"1: Attack with your {player.weapon.name}")
+                print("2: Run away")
+                print("3: Try to intimidate the creature")
+                print("Type 'quit' to exit.")
+                choice = input("Choose an option: ").strip().lower()
+                if choice == "quit":
+                    print()
+                    print("Thanks for playing!")
+                    break
+                elif choice == "1":
+                    print()
+                    print(f"You lunge forward and attack with your {player.weapon.name}!")
+                    print("The creature is caught off guard and is slain by your swift strike.")
+                    print()
+                    print("You feel a surge of power as you level up!")
+                    player.level_up()
+                    if hasattr(player, 'attribute_points') and player.attribute_points >= 3:
+                        print("Allocate your 3 stat points:")
+                        for i in range(3):
+                            print(f"Point {i+1} - Choose: vitality, agility, strength, intelligence")
+                            stat = input("Attribute: ").strip().lower()
+                            from enemy import allocate_attribute
+                            allocate_attribute(player, stat)
+                    print()
+                    loot_choice = input("Would you like to loot the corpse? (y/n): ").strip().lower()
+                    if loot_choice == "y":
+                        print("You search the corpse and find a rusty key labeled 'Armory Key'.")
+                        from item import Item
+                        armory_key = Item("Armory Key", "A rusty key that opens the armory.")
+                        player.inventory.add_item(armory_key)
+                    else:
+                        print("You leave the corpse untouched and return to the village.")
+                    print()
+                    print("You return to the village, emboldened by your victory.")
+                    current_scene = scenes.get("Primitive Village")
+                elif choice == "2":
+                    print()
+                    if player.weapon == dagger:
+                        print("With nimble agility, you dart past the creature, evading its grasp and slipping through the shadows. As a Rogue, you safely return to the village center, unseen and unscathed.")
+                        current_scene = scenes.get("Primitive Village")
+                        rogue_escaped_alley = True
+                    else:
+                        print("You try to run, but the creature is faster than you expected. It catches you and you meet a swift end.")
+                        print("GAME OVER.")
+                        return
+                elif choice == "3":
+                    print()
+                    if player.weapon == axe:
+                        print("You brandish your axe and roar with authority. The creature cowers, drops a rusty key labeled 'Armory Key', and flees into its burrow!")
+                        from item import Item
+                        armory_key = Item("Armory Key", "A rusty key that opens the armory.")
+                        player.inventory.add_item(armory_key)
+                        print("You return to the village, having asserted your dominance.")
+                        current_scene = scenes.get("Primitive Village")
+                    else:
+                        print("You try to intimidate the creature, but it is unfazed. It attacks and you meet a swift end.")
+                        print("GAME OVER.")
+                        return
+                else:
+                    print("Invalid option.")
+                continue
             print()
-            print("You step into the heart of the primitive village. Crude huts made of bone and hide cluster around a central fire pit, where embers glow and smoke drifts into the cavernous air. Strange symbols are painted on the rocks, and you hear the distant chatter of unseen creatures. Paths lead off in several directions: a shadowy alley, a fortified armory, and a large chief's house adorned with trophies.")
+            print("Invalid option.")
+        elif current_scene.name == "Primitive Village":
+            if not visited_village:
+                print()
+                print("You step into the heart of the primitive village. Crude huts made of bone and hide cluster around a central fire pit, where embers glow and smoke drifts into the cavernous air. Strange symbols are painted on the rocks, and you hear the distant chatter of unseen creatures. Paths lead off in several directions: a shadowy alley, a fortified armory, and a large chief's house adorned with trophies.")
+                visited_village = True
             print()
             print("Where would you like to go?")
             print("1: Enter the Alley (dangerous shadows)")
@@ -224,12 +277,38 @@ def main():
             elif choice == "2":
                 next_scene = scenes.get("Armory")
                 if next_scene:
+                    # Check if the scene is locked and if player has the key
+                    if getattr(next_scene, 'locked', False):
+                        key_name = getattr(next_scene, 'key', None)
+                        if key_name and not hasattr(player.inventory, 'has_item'):
+                            print()
+                            print("The Armory is locked, but your inventory system does not support key checks.")
+                            print("You're still in the village.")
+                            continue
+                        elif key_name and not player.inventory.has_item(key_name):
+                            print()
+                            print("You approach the Armory, but the door is locked. You need the Armory Key to enter.")
+                            print("You're still in the village.")
+                            continue
                     current_scene = next_scene
                 else:
                     print("That exit doesn't lead anywhere.")
             elif choice == "3":
                 next_scene = scenes.get("Cave People Chief House")
                 if next_scene:
+                    # Check if the scene is locked and if player has the key
+                    if getattr(next_scene, 'locked', False):
+                        key_name = getattr(next_scene, 'key', None)
+                        if key_name and not hasattr(player.inventory, 'has_item'):
+                            print()
+                            print("The Chief's House is locked, but your inventory system does not support key checks.")
+                            print("You're still in the village.")
+                            continue
+                        elif key_name and not player.inventory.has_item(key_name):
+                            print()
+                            print("You approach the Chief's House, but the door is locked and the chief glares at you. You need the Town Key to enter.")
+                            print("You're still in the village.")
+                            continue
                     current_scene = next_scene
                 else:
                     print("That exit doesn't lead anywhere.")
