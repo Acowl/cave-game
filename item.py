@@ -61,3 +61,25 @@ wand = Weapon(
     scale_attr="intelligence"
 )
 
+# Enhanced weapons found in the Armory
+enhanced_dagger = Weapon(
+    name="Shadow Blade",
+    description="An ancient dagger that gleams with dark energy. Greatly favors agility.",
+    base_damage=12,
+    scale_attr="agility"
+)
+
+enhanced_axe = Weapon(
+    name="Bone Crusher",
+    description="A massive war axe carved from ancient bone. Greatly favors strength.",
+    base_damage=18,
+    scale_attr="strength"
+)
+
+enhanced_wand = Weapon(
+    name="Skull Scepter",
+    description="A mystical scepter crowned with a miniature skull. Greatly favors intelligence.",
+    base_damage=15,
+    scale_attr="intelligence"
+)
+
