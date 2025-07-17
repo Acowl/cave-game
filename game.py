@@ -13,12 +13,12 @@ def setup_scenes():
     skull_chamber = Scene(
         name="Skull Chamber",
         description=(
-            "You squeeze through the crack and find yourself in a vast, echoing chamber. "
-            "The air is thick with dust and the faint scent of something ancient. "
-            "At the center of the room, illuminated by an eerie, pulsating glow, sits a colossal skull—its empty eye sockets seem to watch your every move. "
-            "Shadows dance along the walls, cast by the flickering light within the skull. "
-            "The silence is heavy, broken only by the distant drip of water and your own heartbeat. "
-            "There is a sense of awe and dread here, as if you have stepped into the remains of something once divine."
+            "\n"
+            "The air is thick with dust and the faint scent of something ancient.\n"
+            "At the center of the room, illuminated by an eerie, pulsating glow, sits a colossal skull—its empty eye sockets seem to watch your every move.\n"
+            "Shadows dance along the walls, cast by the flickering light within the skull.\n"
+            "The silence is heavy, broken only by the distant drip of water and your own heartbeat.\n"
+            "There is a sense of awe and dread here, as if you have stepped into the remains of something once divine.\n"
         ),
         exits={"back": "Cave Entrance", "forward": "Primitive Village"}
     )
@@ -152,12 +152,12 @@ def main():
                 else:
                     print()
                     print("Invalid option.")
-        elif current_scene.name == "Primitive Village":
+        elif current_scene.name == "Skull Chamber":
             print()
             current_scene.enter(player)
             print()
-            print("You notice something moving in the distance among the primitive structures.")
-            print("Do you want to chase after it?")
+            print("You see a distant figure scurry away among the shadows near the giant skull.")
+            print("Would you like to chase after it?")
             print("1: Yes")
             print("2: No")
             print("Type 'quit' to exit.")
@@ -168,31 +168,27 @@ def main():
                 break
             elif chase_choice == "1":
                 print()
-                print("You run after the moving figure, but it quickly disappears into the shadows. You feel watched.")
-                # Move to next scene (simulate forward exit)
-                next_scene = scenes.get(current_scene.exits.get("forward"))
-                if next_scene:
-                    current_scene = next_scene
-                else:
-                    print("There's nowhere to go forward.")
+                print("You run after the moving figure, following its fleeting shadow through the chamber. You are led straight into the primitive village.")
+                current_scene = scenes.get("Primitive Village")
                 continue
             elif chase_choice == "2":
                 print()
                 print("You decide not to chase after it and remain cautious.")
-                print("Suddenly, a rockfall blocks all exits except one!")
+                print("Suddenly, a rockfall blocks the path behind you! There is only one way forward now.")
                 # Restrict exits to only 'forward'
-                current_scene.exits = {"forward": "Primitive Village Changed"}
+                current_scene.exits = {"forward": "Primitive Village"}
                 while True:
                     print()
                     print("You can only move forward now.")
-                    print("Type 'forward' to continue or 'quit' to exit.")
-                    cmd = input().strip().lower()
+                    print("1: Move forward")
+                    print("Type 'quit' to exit.")
+                    cmd = input("Choose an option: ").strip().lower()
                     if cmd == "quit":
                         print()
                         print("Thanks for playing!")
                         return
-                    elif cmd == "forward":
-                        next_scene = scenes.get("Primitive Village Changed")
+                    elif cmd == "1":
+                        next_scene = scenes.get("Primitive Village")
                         if next_scene:
                             current_scene = next_scene
                             break
@@ -205,26 +201,51 @@ def main():
             else:
                 print()
                 print("Invalid option.")
+        elif current_scene.name == "Primitive Village":
             print()
-            print("Exits:", ', '.join(current_scene.exits.keys()))
-            cmd = input("Where do you want to go? (or 'quit'): ").strip().lower()
-            if cmd == "quit":
+            print("You step into the heart of the primitive village. Crude huts made of bone and hide cluster around a central fire pit, where embers glow and smoke drifts into the cavernous air. Strange symbols are painted on the rocks, and you hear the distant chatter of unseen creatures. Paths lead off in several directions: a shadowy alley, a fortified armory, and a large chief's house adorned with trophies.")
+            print()
+            print("Where would you like to go?")
+            print("1: Enter the Alley (dangerous shadows)")
+            print("2: Approach the Armory (locked chamber)")
+            print("3: Visit the Chief's House (imposing hut)")
+            print("4: Stay by the fire pit")
+            print("Type 'quit' to exit.")
+            choice = input("Choose an option: ").strip().lower()
+            if choice == "quit":
                 print("Thanks for playing!")
                 break
-            if cmd in current_scene.exits:
-                next_scene_name = current_scene.exits[cmd]
-                next_scene = scenes.get(next_scene_name)
+            elif choice == "1":
+                next_scene = scenes.get("Alley")
                 if next_scene:
                     current_scene = next_scene
                 else:
                     print("That exit doesn't lead anywhere.")
+            elif choice == "2":
+                next_scene = scenes.get("Armory")
+                if next_scene:
+                    current_scene = next_scene
+                else:
+                    print("That exit doesn't lead anywhere.")
+            elif choice == "3":
+                next_scene = scenes.get("Cave People Chief House")
+                if next_scene:
+                    current_scene = next_scene
+                else:
+                    print("That exit doesn't lead anywhere.")
+            elif choice == "4":
+                print()
+                print("You linger by the fire pit, feeling the warmth and watching the shadows dance. The village seems to hold its breath, waiting for your next move.")
             else:
-                print("Invalid direction.")
+                print("Invalid option.")
         else:
+            print()
             current_scene.enter(player)
+            print()
             print("Exits:", ', '.join(current_scene.exits.keys()))
             cmd = input("Where do you want to go? (or 'quit'): ").strip().lower()
             if cmd == "quit":
+                print()
                 print("Thanks for playing!")
                 break
             if cmd in current_scene.exits:

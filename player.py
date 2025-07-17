@@ -28,13 +28,13 @@ class Scene:
         self.key = key  # name of key that unlocks
 
     def enter(self, player):
-        if self.locked and self.key not in player.inventory:
+        if self.locked and not player.inventory.has_item(self.key):
             print("The door is locked. You need the key.")
             return False
         print(f"You enter the {self.name}. {self.description}")
         return True
     def unlock(self, player):
-        if self.locked and self.key in player.inventory:
+        if self.locked and player.inventory.has_item(self.key):
             self.locked = False
             print(f"You unlock the {self.name} with the {self.key}.")
         else:

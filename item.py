@@ -35,6 +35,12 @@ class Inventory:
         for item in self.items:
             print(f"{item.name}: {item.description}")
 
+    def has_item(self, item_name):
+        for item in self.items:
+            if item.name == item_name:
+                return True
+        return False
+
 # Example weapons
 dagger = Weapon(
     name="Dagger",
