@@ -18,9 +18,42 @@ Cave Game is an immersive text-based adventure that takes players deep into an u
 - **Underground World Exploration** with primitive subterranean inhabitants
 - **Death & Restart System** that returns players to the title screen
 
----
+## 🚀 **Quick Start**
 
-## 🛠️ **Technical Architecture & Skills Demonstrated**
+### **Prerequisites**
+- Python 3.7 or higher
+- No external dependencies required (uses only Python standard library)
+
+### **Installation & Running**
+```bash
+# Clone or download the project
+cd cave-game
+
+# Run the game
+python main.py
+# OR
+python game_refactored.py
+```
+
+### **Project Structure**
+```
+cave-game/
+├── main.py              # Game launcher (recommended entry point)
+├── game_refactored.py   # Main game loop and scene coordination  
+├── config.py            # Game constants and settings
+├── ui.py                # User interface and input handling
+├── combat.py            # Combat system and weapon mechanics
+├── game_events.py       # Player progression and game mechanics
+├── scenes.py            # Scene management and world structure
+├── player.py            # Player and Scene class definitions
+├── item.py              # Item and weapon definitions
+├── test_game.py         # Test suite for modular architecture
+├── requirements.txt     # Python dependencies (none required)
+├── .gitignore           # Git ignore patterns
+└── README.md            # This file
+```
+
+---
 
 ### **Programming Paradigms & Design Patterns**
 - **Object-Oriented Programming (OOP)**: Modular class design with clear separation of concerns

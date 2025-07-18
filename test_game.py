@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 """
-Test script to verify game functionality
+Test script to verify the modular Cave Game functionality
 """
 
-def test_game_flow():
-    print("=== CAVE GAME TEST REPORT ===")
+def test_modular_game():
+    print("=== MODULAR CAVE GAME TEST REPORT ===")
     print()
     
-    # Test imports
+    # Test modular imports
     try:
+        from config import STAT_REQUIREMENT, SCENE_NAMES
         from player import Player, Scene
         from item import Inventory, dagger, axe, wand, enhanced_dagger, enhanced_axe, enhanced_wand
-        from enemy import Enemy, gain_experience, allocate_attribute
-        print("✅ All imports successful")
+        from combat import check_weapon_effectiveness, execute_weapon_attack
+        from game_events import start_game, handle_level_up
+        from scenes import setup_scenes
+        from ui import title_screen, display_weapon_choices
+        print("✅ All modular imports successful")
     except ImportError as e:
         print(f"❌ Import error: {e}")
         return
@@ -91,4 +95,4 @@ def test_game_flow():
     print("✅ All systems appear to be working correctly!")
 
 if __name__ == "__main__":
-    test_game_flow()
+    test_modular_game()

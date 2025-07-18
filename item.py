@@ -1,4 +1,13 @@
 
+#!/usr/bin/env python3
+"""
+Cave Game Item and Weapon System
+
+This module defines the item and weapon classes used throughout the game.
+Includes inventory management and weapon definitions for all character classes.
+"""
+
+
 class Item:
     def __init__(self, name, description):
         self.name = name
