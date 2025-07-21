@@ -27,7 +27,7 @@ cave-game/
 ```
 
 ## Code Quality Metrics
-- **Total Lines of Code**: 1,429 lines
+- **Total Lines of Code**: 1,445 lines
 - **Number of Modules**: 10 Python files
 - **Code Coverage**: All major functionality tested
 - **Documentation**: Comprehensive docstrings throughout
