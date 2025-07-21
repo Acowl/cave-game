@@ -95,7 +95,7 @@ cave-game/
 
 #### **⚔️ Warrior (Strength-Based)**
 - **Starting Weapon**: Axe (Base: 8 damage + Strength scaling)
-- **Enhanced Weapon**: Bone Crusher (Base: 15 damage + Strength scaling)
+- **Enhanced Weapon**: Bone Crusher (Base: 18 damage + Strength scaling)
 - **Special Ability**: Berserker Rage - Devastating fury attacks
 - **Unique Mechanics**:
   - Can intimidate enemies without combat
@@ -104,7 +104,7 @@ cave-game/
 
 #### **🔮 Mage (Intelligence-Based)**
 - **Starting Weapon**: Wand (Base: 6 damage + Intelligence scaling)
-- **Enhanced Weapon**: Skull Scepter (Base: 10 damage + Intelligence scaling)
+- **Enhanced Weapon**: Skull Scepter (Base: 15 damage + Intelligence scaling)
 - **Special Ability**: Strategic Masterstroke - Environmental manipulation
 - **Unique Mechanics**:
   - Magical damage calculation with intelligence scaling
