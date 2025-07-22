@@ -1,0 +1,19 @@
+# SHABUYA Cave Adventure - Python Requirements
+# 
+# This game uses only Python standard library modules.
+# No additional packages need to be installed!
+#
+# Minimum Python version: 3.7
+#
+# Standard library modules used:
+# - tkinter (for GUI mode)
+# - random (for game mechanics)  
+# - json (for save/load functionality)
+# - pathlib (for file handling)
+# - sys (for system integration)
+# - os (for cross-platform compatibility)
+
+# For GUI mode, ensure tkinter is available:
+# Windows: Install Python with tcl/tk option checked
+# Linux: sudo apt-get install python3-tk
+# Mac: brew install python-tk
