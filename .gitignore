@@ -123,3 +123,14 @@ dmypy.json
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# Game-specific files
+save_game.json
+*.save
+game_logs/
+screenshots/
+temp/
+
+# VNC/GUI setup files (for development only)
+*.vnc
+.Xauthority
