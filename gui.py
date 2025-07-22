@@ -1,592 +1,276 @@
 #!/usr/bin/env python3
 """
-Cave Game GUI Interface
-
-A graphical user interface for the Cave Game that wraps around the existing
-text-based game logic while providing enhanced visual experience.
+SHABUYA Cave Adventure - Desktop GUI
+Clean, simple interface optimized for desktop use
 """
 
 import tkinter as tk
-from tkinter import scrolledtext, messagebox, ttk
-from tkinter import font as tkfont
-import threading
-import queue
+from tkinter import ttk, messagebox, scrolledtext
 import sys
-from io import StringIO
-
-from game_refactored import main as text_main
-from player import Player
-from item import dagger, axe, wand
-from config import *
+from pathlib import Path
 
 class CaveGameGUI:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("🗻 SHABUYA - Cave Adventure 🗻")
-        self.root.geometry("1200x800")
+        self.player = None
+        self.game_state = "menu"
+        self.setup_window()
+        self.create_interface()
+        
+    def setup_window(self):
+        """Setup main window"""
+        self.root.title("🗻 SHABUYA - Cave Adventure")
+        self.root.geometry("1000x700")
         self.root.configure(bg='#2c1810')
+        self.root.resizable(True, True)
         
-        # Colors for cave theme
-        self.colors = {
-            'bg': '#2c1810',        # Dark brown (cave walls)
-            'text': '#d4af37',      # Gold (torch light)
-            'accent': '#8b4513',    # Saddle brown
-            'danger': '#dc143c',    # Crimson 
-            'success': '#32cd32',   # Lime green
-            'input_bg': '#3c2820',  # Slightly lighter brown
-            'button': '#654321',    # Medium brown
-            'panel_bg': '#3c2414',  # Panel background
-            'border': '#654321'     # Border color
-        }
+        # Center window
+        self.root.update_idletasks()
+        x = (self.root.winfo_screenwidth() // 2) - (1000 // 2)
+        y = (self.root.winfo_screenheight() // 2) - (700 // 2)
+        self.root.geometry(f"1000x700+{x}+{y}")
         
-        # Game state
-        self.game_thread = None
-        self.input_queue = queue.Queue()
-        self.output_queue = queue.Queue()
-        self.game_running = False
-        self.current_player = None
-        
-        self.setup_ui()
-        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        
-    def setup_ui(self):
-        """Create the main UI components"""
-        # Title
-        title_font = tkfont.Font(family="Arial", size=20, weight="bold")
-        title_label = tk.Label(
-            self.root, 
-            text="🗻 SHABUYA - Cave Adventure 🗻",
-            font=title_font,
-            fg=self.colors['text'],
-            bg=self.colors['bg']
-        )
-        title_label.pack(pady=10)
-        
+    def create_interface(self):
+        """Create the main game interface"""
         # Main container
-        main_container = tk.Frame(self.root, bg=self.colors['bg'])
-        main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        main_frame = tk.Frame(self.root, bg='#2c1810')
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
-        # Left panel (Character Stats & Inventory)
-        self.create_left_panel(main_container)
+        # Title
+        title_frame = tk.Frame(main_frame, bg='#2c1810')
+        title_frame.pack(fill=tk.X, pady=(0, 20))
         
-        # Center panel (Game Display)
-        self.create_center_panel(main_container)
+        title_label = tk.Label(title_frame, text="🗻 SHABUYA - CAVE ADVENTURE 🗻", 
+                              font=("Arial", 20, "bold"), fg='#DAA520', bg='#2c1810')
+        title_label.pack()
         
-        # Right panel (Controls)
-        self.create_right_panel(main_container)
+        # Game area
+        game_frame = tk.Frame(main_frame, bg='#2c1810')
+        game_frame.pack(fill=tk.BOTH, expand=True)
         
-        # Status bar
-        self.create_status_bar()
+        # Left panel - Character stats
+        self.create_stats_panel(game_frame)
         
-    def create_left_panel(self, parent):
-        """Create left panel with character stats and inventory"""
-        left_frame = tk.Frame(parent, bg=self.colors['bg'], width=280)
-        left_frame.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 10))
-        left_frame.pack_propagate(False)
+        # Center panel - Game display
+        self.create_game_panel(game_frame)
         
-        # Character Stats Panel
-        self.create_character_stats_panel(left_frame)
+        # Right panel - Controls
+        self.create_controls_panel(game_frame)
         
-        # Inventory Panel
-        self.create_inventory_panel(left_frame)
-        
-    def create_character_stats_panel(self, parent):
-        """Create character statistics display panel"""
-        stats_frame = tk.LabelFrame(
-            parent,
-            text="🧙 Character Stats",
-            fg=self.colors['text'],
-            bg=self.colors['panel_bg'],
-            font=("Arial", 12, "bold"),
-            relief=tk.RAISED,
-            bd=2
-        )
-        stats_frame.pack(fill=tk.X, pady=(0, 10))
+    def create_stats_panel(self, parent):
+        """Create character stats panel"""
+        stats_frame = tk.LabelFrame(parent, text="🧙 Character", font=("Arial", 12, "bold"),
+                                   fg='#DAA520', bg='#3c2820', relief=tk.RAISED, bd=2)
+        stats_frame.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 10))
         
         # Character info
-        self.char_name_label = tk.Label(
-            stats_frame,
-            text="Name: Not Started",
-            font=("Arial", 10, "bold"),
-            fg=self.colors['text'],
-            bg=self.colors['panel_bg']
-        )
-        self.char_name_label.pack(anchor=tk.W, padx=10, pady=2)
+        self.char_info = tk.Text(stats_frame, width=25, height=15, 
+                                bg='#2c1810', fg='#DAA520', font=("Courier", 10),
+                                relief=tk.SUNKEN, bd=2, state=tk.DISABLED)
+        self.char_info.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         
-        self.char_class_label = tk.Label(
-            stats_frame,
-            text="Class: None",
-            font=("Arial", 10),
-            fg=self.colors['accent'],
-            bg=self.colors['panel_bg']
-        )
-        self.char_class_label.pack(anchor=tk.W, padx=10, pady=2)
+        # Inventory
+        inv_label = tk.Label(stats_frame, text="🎒 Inventory", font=("Arial", 10, "bold"),
+                            fg='#DAA520', bg='#3c2820')
+        inv_label.pack(pady=(10, 5))
         
-        self.char_level_label = tk.Label(
-            stats_frame,
-            text="Level: 1",
-            font=("Arial", 10),
-            fg=self.colors['success'],
-            bg=self.colors['panel_bg']
-        )
-        self.char_level_label.pack(anchor=tk.W, padx=10, pady=2)
+        self.inventory_list = tk.Listbox(stats_frame, height=6, bg='#2c1810', fg='#CD853F',
+                                        font=("Courier", 9), relief=tk.SUNKEN, bd=2)
+        self.inventory_list.pack(padx=10, pady=(0, 10), fill=tk.X)
         
-        # Separator
-        separator = tk.Frame(stats_frame, height=2, bg=self.colors['border'])
-        separator.pack(fill=tk.X, padx=10, pady=5)
+    def create_game_panel(self, parent):
+        """Create main game display panel"""
+        game_frame = tk.Frame(parent, bg='#2c1810')
+        game_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
         
-        # Primary Stats
-        stats_container = tk.Frame(stats_frame, bg=self.colors['panel_bg'])
-        stats_container.pack(fill=tk.X, padx=10, pady=5)
-        
-        # Health
-        tk.Label(
-            stats_container,
-            text="❤️ Health:",
-            font=("Arial", 9, "bold"),
-            fg=self.colors['danger'],
-            bg=self.colors['panel_bg']
-        ).grid(row=0, column=0, sticky=tk.W, pady=1)
-        
-        self.health_var = tk.StringVar(value="100/100")
-        self.health_label = tk.Label(
-            stats_container,
-            textvariable=self.health_var,
-            font=("Arial", 9),
-            fg=self.colors['text'],
-            bg=self.colors['panel_bg']
-        )
-        self.health_label.grid(row=0, column=1, sticky=tk.E, pady=1)
-        
-        # Stat displays
-        stat_labels = [
-            ("💪 Strength:", "strength_var"),
-            ("🧠 Intelligence:", "intelligence_var"),
-            ("⚡ Agility:", "agility_var"),
-            ("🛡️ Vitality:", "vitality_var")
-        ]
-        
-        self.stat_vars = {}
-        for i, (label_text, var_name) in enumerate(stat_labels, 1):
-            tk.Label(
-                stats_container,
-                text=label_text,
-                font=("Arial", 9),
-                fg=self.colors['text'],
-                bg=self.colors['panel_bg']
-            ).grid(row=i, column=0, sticky=tk.W, pady=1)
-            
-            var = tk.StringVar(value="5")
-            self.stat_vars[var_name] = var
-            tk.Label(
-                stats_container,
-                textvariable=var,
-                font=("Arial", 9, "bold"),
-                fg=self.colors['accent'],
-                bg=self.colors['panel_bg']
-            ).grid(row=i, column=1, sticky=tk.E, pady=1)
-        
-    def create_inventory_panel(self, parent):
-        """Create inventory display panel"""
-        inv_frame = tk.LabelFrame(
-            parent,
-            text="🎒 Inventory & Equipment",
-            fg=self.colors['text'],
-            bg=self.colors['panel_bg'],
-            font=("Arial", 12, "bold"),
-            relief=tk.RAISED,
-            bd=2
-        )
-        inv_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
-        
-        # Current Weapon
-        weapon_frame = tk.Frame(inv_frame, bg=self.colors['panel_bg'])
-        weapon_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        tk.Label(
-            weapon_frame,
-            text="🗡️ Current Weapon:",
-            font=("Arial", 10, "bold"),
-            fg=self.colors['text'],
-            bg=self.colors['panel_bg']
-        ).pack(anchor=tk.W)
-        
-        self.current_weapon_var = tk.StringVar(value="None equipped")
-        self.weapon_label = tk.Label(
-            weapon_frame,
-            textvariable=self.current_weapon_var,
-            font=("Arial", 9),
-            fg=self.colors['accent'],
-            bg=self.colors['panel_bg'],
-            wraplength=250
-        )
-        self.weapon_label.pack(anchor=tk.W, padx=10)
-        
-        # Items List
-        tk.Label(
-            inv_frame,
-            text="📦 Items & Keys:",
-            font=("Arial", 10, "bold"),
-            fg=self.colors['text'],
-            bg=self.colors['panel_bg']
-        ).pack(anchor=tk.W, padx=10, pady=(10, 5))
-        
-        # Scrollable items list
-        items_container = tk.Frame(inv_frame, bg=self.colors['panel_bg'])
-        items_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
-        
-        self.items_listbox = tk.Listbox(
-            items_container,
-            font=("Arial", 9),
-            bg=self.colors['input_bg'],
-            fg=self.colors['text'],
-            selectbackground=self.colors['accent'],
-            relief=tk.SUNKEN,
-            bd=1,
-            height=8
-        )
-        
-        items_scrollbar = tk.Scrollbar(items_container, orient=tk.VERTICAL)
-        self.items_listbox.config(yscrollcommand=items_scrollbar.set)
-        items_scrollbar.config(command=self.items_listbox.yview)
-        
-        self.items_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        items_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        
-        # Initially populate with placeholder
-        self.items_listbox.insert(tk.END, "🔍 No items yet")
-        
-    def create_center_panel(self, parent):
-        """Create center panel with game display"""
-        center_frame = tk.Frame(parent, bg=self.colors['bg'])
-        center_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        
-        # Game display area
-        self.create_display_area(center_frame)
-        
-    def create_display_area(self, parent):
-        """Create the main text display area"""
-        display_frame = tk.Frame(parent, bg=self.colors['bg'])
+        # Game display
+        display_frame = tk.LabelFrame(game_frame, text="📖 Adventure", font=("Arial", 12, "bold"),
+                                     fg='#DAA520', bg='#3c2820', relief=tk.RAISED, bd=2)
         display_frame.pack(fill=tk.BOTH, expand=True)
         
-        # Text display
-        self.text_display = scrolledtext.ScrolledText(
-            display_frame,
-            wrap=tk.WORD,
-            width=60,
-            height=30,
-            font=("Courier New", 11),
-            bg=self.colors['input_bg'],
-            fg=self.colors['text'],
-            insertbackground=self.colors['text'],
-            selectbackground=self.colors['accent']
-        )
-        self.text_display.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        self.game_display = scrolledtext.ScrolledText(display_frame, bg='#1a0f08', fg='#DAA520',
+                                                     font=("Courier", 11), relief=tk.SUNKEN, bd=2,
+                                                     wrap=tk.WORD, state=tk.DISABLED)
+        self.game_display.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         
-        # Input frame
-        input_frame = tk.Frame(display_frame, bg=self.colors['bg'])
-        input_frame.pack(fill=tk.X)
+        # Command input
+        input_frame = tk.Frame(game_frame, bg='#2c1810')
+        input_frame.pack(fill=tk.X, pady=(10, 0))
         
-        tk.Label(
-            input_frame, 
-            text="Command:", 
-            font=("Arial", 12, "bold"),
-            fg=self.colors['text'],
-            bg=self.colors['bg']
-        ).pack(side=tk.LEFT)
+        tk.Label(input_frame, text="Command:", font=("Arial", 10, "bold"),
+                fg='#DAA520', bg='#2c1810').pack(side=tk.LEFT)
         
-        self.command_entry = tk.Entry(
-            input_frame,
-            font=("Courier New", 12),
-            bg=self.colors['input_bg'],
-            fg=self.colors['text'],
-            insertbackground=self.colors['text']
-        )
-        self.command_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(5, 5))
-        self.command_entry.bind('<Return>', self.send_command)
+        self.command_var = tk.StringVar()
+        self.command_entry = tk.Entry(input_frame, textvariable=self.command_var,
+                                     bg='#3c2820', fg='#DAA520', font=("Courier", 11),
+                                     relief=tk.SUNKEN, bd=2)
+        self.command_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(10, 10))
+        self.command_entry.bind('<Return>', self.process_command)
         
-        send_btn = tk.Button(
-            input_frame,
-            text="Send",
-            command=self.send_command,
-            bg=self.colors['button'],
-            fg=self.colors['text'],
-            font=("Arial", 10, "bold")
-        )
-        send_btn.pack(side=tk.RIGHT)
+        execute_btn = tk.Button(input_frame, text="⚡ Execute", font=("Arial", 10, "bold"),
+                               bg='#8B4513', fg='white', relief=tk.RAISED, bd=2,
+                               command=self.process_command)
+        execute_btn.pack(side=tk.RIGHT)
         
-    def create_right_panel(self, parent):
-        """Create right panel with controls"""
-        control_frame = tk.Frame(parent, bg=self.colors['bg'], width=250)
-        control_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
-        control_frame.pack_propagate(False)
+    def create_controls_panel(self, parent):
+        """Create quick controls panel"""
+        controls_frame = tk.LabelFrame(parent, text="🎮 Quick Actions", font=("Arial", 12, "bold"),
+                                      fg='#DAA520', bg='#3c2820', relief=tk.RAISED, bd=2)
+        controls_frame.pack(side=tk.RIGHT, fill=tk.Y)
         
         # Game controls
-        tk.Label(
-            control_frame,
-            text="🎮 Game Controls",
-            font=("Arial", 14, "bold"),
-            fg=self.colors['text'],
-            bg=self.colors['bg']
-        ).pack(pady=(0, 10))
+        game_controls = tk.Frame(controls_frame, bg='#3c2820')
+        game_controls.pack(padx=10, pady=10)
         
-        # Start/Stop buttons
-        btn_frame = tk.Frame(control_frame, bg=self.colors['bg'])
-        btn_frame.pack(fill=tk.X, pady=5)
+        tk.Button(game_controls, text="🎯 New Game", width=15, font=("Arial", 10),
+                 bg='#228B22', fg='white', command=self.new_game).pack(pady=2)
+        tk.Button(game_controls, text="💾 Save Game", width=15, font=("Arial", 10),
+                 bg='#4682B4', fg='white', command=self.save_game).pack(pady=2)
+        tk.Button(game_controls, text="📁 Load Game", width=15, font=("Arial", 10),
+                 bg='#4682B4', fg='white', command=self.load_game).pack(pady=2)
         
-        self.start_btn = tk.Button(
-            btn_frame,
-            text="🎮 New Game",
-            command=self.start_game,
-            bg=self.colors['success'],
-            fg='white',
-            font=("Arial", 10, "bold"),
-            height=2
-        )
-        self.start_btn.pack(fill=tk.X, pady=2)
+        # Movement
+        tk.Label(controls_frame, text="🧭 Movement", font=("Arial", 10, "bold"),
+                fg='#DAA520', bg='#3c2820').pack(pady=(20, 5))
         
-        self.stop_btn = tk.Button(
-            btn_frame,
-            text="⏹️ Stop Game",
-            command=self.stop_game,
-            bg=self.colors['danger'],
-            fg='white',
-            font=("Arial", 10, "bold"),
-            state=tk.DISABLED
-        )
-        self.stop_btn.pack(fill=tk.X, pady=2)
+        movement_frame = tk.Frame(controls_frame, bg='#3c2820')
+        movement_frame.pack()
         
-        # Quick actions
-        tk.Label(
-            control_frame,
-            text="⚡ Quick Actions",
-            font=("Arial", 12, "bold"),
-            fg=self.colors['text'],
-            bg=self.colors['bg']
-        ).pack(pady=(20, 10))
+        # North
+        tk.Button(movement_frame, text="⬆️ North", width=12, font=("Arial", 9),
+                 bg='#8B4513', fg='white', command=lambda: self.quick_command("north")).pack()
         
-        # Movement buttons
-        self.create_movement_buttons(control_frame)
+        # East/West
+        ew_frame = tk.Frame(movement_frame, bg='#3c2820')
+        ew_frame.pack()
+        tk.Button(ew_frame, text="⬅️ West", width=6, font=("Arial", 9),
+                 bg='#8B4513', fg='white', command=lambda: self.quick_command("west")).pack(side=tk.LEFT)
+        tk.Button(ew_frame, text="East ➡️", width=6, font=("Arial", 9),
+                 bg='#8B4513', fg='white', command=lambda: self.quick_command("east")).pack(side=tk.RIGHT)
         
-        # Common actions
-        self.create_action_buttons(control_frame)
+        # South
+        tk.Button(movement_frame, text="⬇️ South", width=12, font=("Arial", 9),
+                 bg='#8B4513', fg='white', command=lambda: self.quick_command("south")).pack()
         
-    def create_movement_buttons(self, parent):
-        """Create movement quick buttons"""
-        move_frame = tk.LabelFrame(
-            parent,
-            text="🧭 Movement",
-            fg=self.colors['text'],
-            bg=self.colors['bg'],
-            font=("Arial", 10, "bold")
-        )
-        move_frame.pack(fill=tk.X, pady=5)
+        # Actions
+        tk.Label(controls_frame, text="⚔️ Actions", font=("Arial", 10, "bold"),
+                fg='#DAA520', bg='#3c2820').pack(pady=(20, 5))
         
-        movements = [
-            ("🔺 North", "north"),
-            ("🔻 South", "south"), 
-            ("◀️ West", "west"),
-            ("▶️ East", "east")
-        ]
+        action_frame = tk.Frame(controls_frame, bg='#3c2820')
+        action_frame.pack()
         
-        for text, cmd in movements:
-            btn = tk.Button(
-                move_frame,
-                text=text,
-                command=lambda c=cmd: self.quick_command(c),
-                bg=self.colors['button'],
-                fg=self.colors['text'],
-                font=("Arial", 9)
-            )
-            btn.pack(fill=tk.X, pady=1, padx=5)
-            
-    def create_action_buttons(self, parent):
-        """Create action quick buttons"""
-        action_frame = tk.LabelFrame(
-            parent,
-            text="⚔️ Actions",
-            fg=self.colors['text'],
-            bg=self.colors['bg'],
-            font=("Arial", 10, "bold")
-        )
-        action_frame.pack(fill=tk.X, pady=5)
-        
-        actions = [
-            ("⚔️ Attack", "1"),
-            ("🏃 Run Away", "5"),
-            ("👁️ Look", "look"),
-            ("🎒 Inventory", "inventory"),
-            ("📊 Stats", "stats"),
-            ("❓ Help", "help")
-        ]
+        actions = [("👁️ Look", "look"), ("🎒 Inventory", "inventory"), 
+                  ("📊 Stats", "stats"), ("❓ Help", "help")]
         
         for text, cmd in actions:
-            btn = tk.Button(
-                action_frame,
-                text=text,
-                command=lambda c=cmd: self.quick_command(c),
-                bg=self.colors['button'],
-                fg=self.colors['text'],
-                font=("Arial", 9)
-            )
-            btn.pack(fill=tk.X, pady=1, padx=5)
-            
-    def create_status_bar(self):
-        """Create status bar"""
-        self.status_bar = tk.Label(
-            self.root,
-            text="Ready to start adventure...",
-            relief=tk.SUNKEN,
-            anchor=tk.W,
-            bg=self.colors['accent'],
-            fg=self.colors['text'],
-            font=("Arial", 10)
-        )
-        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+            tk.Button(action_frame, text=text, width=15, font=("Arial", 9),
+                     bg='#654321', fg='white', 
+                     command=lambda c=cmd: self.quick_command(c)).pack(pady=1)
         
-    def start_game(self):
-        """Start the game in a separate thread"""
-        if self.game_running:
+    def display_text(self, text):
+        """Display text in the game area"""
+        self.game_display.config(state=tk.NORMAL)
+        self.game_display.insert(tk.END, text + "\n")
+        self.game_display.see(tk.END)
+        self.game_display.config(state=tk.DISABLED)
+        
+    def update_character_display(self):
+        """Update character stats display"""
+        if not self.player:
             return
             
-        self.game_running = True
-        self.start_btn.config(state=tk.DISABLED)
-        self.stop_btn.config(state=tk.NORMAL)
-        self.command_entry.config(state=tk.NORMAL)
+        self.char_info.config(state=tk.NORMAL)
+        self.char_info.delete(1.0, tk.END)
         
-        # Clear display
-        self.text_display.delete(1.0, tk.END)
-        self.update_status("Game starting...")
+        stats_text = f"""
+Name: {self.player.name}
+Class: {self.player.character_class}
+Level: {self.player.level}
+
+Health: {self.player.health}
+
+💪 Strength: {self.player.strength}
+🧠 Intelligence: {self.player.intelligence}
+⚡ Agility: {self.player.agility}
+🛡️ Vitality: {self.player.vitality}
+        """
         
-        # Start game thread
-        self.game_thread = threading.Thread(target=self.run_game_loop, daemon=True)
-        self.game_thread.start()
+        self.char_info.insert(1.0, stats_text.strip())
+        self.char_info.config(state=tk.DISABLED)
         
-        # Start output monitoring
-        self.root.after(100, self.check_output)
-        
-    def stop_game(self):
-        """Stop the current game"""
-        self.game_running = False
-        self.start_btn.config(state=tk.NORMAL)
-        self.stop_btn.config(state=tk.DISABLED)
-        self.command_entry.config(state=tk.DISABLED)
-        self.update_status("Game stopped")
-        
-    def run_game_loop(self):
-        """Run the game logic in a separate thread"""
-        try:
-            # Redirect stdout to capture game output
-            old_stdout = sys.stdout
-            sys.stdout = StringIO()
-            
-            # Redirect input to our queue system
-            old_input = __builtins__['input']
-            __builtins__['input'] = self.threaded_input
-            
-            # Run the game
-            text_main()
-            
-        except Exception as e:
-            self.output_queue.put(f"Game error: {e}")
-        finally:
-            # Restore stdout and input
-            sys.stdout = old_stdout
-            __builtins__['input'] = old_input
-            self.game_running = False
-            
-    def threaded_input(self, prompt=""):
-        """Handle input requests from the game"""
-        if prompt:
-            self.output_queue.put(prompt)
-            
-        # Wait for user input
-        while self.game_running:
-            try:
-                user_input = self.input_queue.get(timeout=0.1)
-                return user_input
-            except queue.Empty:
-                continue
-                
-        return "quit"  # Return quit if game is stopped
-        
-    def check_output(self):
-        """Check for game output and display it"""
-        try:
-            while True:
-                output = self.output_queue.get_nowait()
-                self.display_text(output)
-        except queue.Empty:
-            pass
-            
-        # Check for stdout content
-        if hasattr(sys.stdout, 'getvalue'):
-            content = sys.stdout.getvalue()
-            if content:
-                self.display_text(content)
-                sys.stdout = StringIO()  # Reset buffer
-                
-        if self.game_running:
-            self.root.after(100, self.check_output)
-        else:
-            self.start_btn.config(state=tk.NORMAL)
-            self.stop_btn.config(state=tk.DISABLED)
-            self.command_entry.config(state=tk.DISABLED)
-            
-    def display_text(self, text):
-        """Display text in the main area with formatting"""
-        self.text_display.config(state=tk.NORMAL)
-        
-        # Add color formatting for special text
-        if "🗻" in text or "SHABUYA" in text:
-            self.text_display.insert(tk.END, text + "\n", 'title')
-        elif "💀" in text or "died" in text.lower():
-            self.text_display.insert(tk.END, text + "\n", 'danger')
-        elif "🌟" in text or "level up" in text.lower():
-            self.text_display.insert(tk.END, text + "\n", 'success')
-        else:
-            self.text_display.insert(tk.END, text + "\n")
-            
-        # Configure text tags
-        self.text_display.tag_config('title', foreground=self.colors['text'], font=("Arial", 12, "bold"))
-        self.text_display.tag_config('danger', foreground=self.colors['danger'], font=("Arial", 11, "bold"))
-        self.text_display.tag_config('success', foreground=self.colors['success'], font=("Arial", 11, "bold"))
-        
-        self.text_display.config(state=tk.DISABLED)
-        self.text_display.see(tk.END)
-        
-    def send_command(self, event=None):
-        """Send command to game"""
-        command = self.command_entry.get().strip()
-        if command and self.game_running:
-            self.input_queue.put(command)
-            self.command_entry.delete(0, tk.END)
-            self.update_status(f"Sent: {command}")
-            
     def quick_command(self, command):
-        """Send a quick command"""
-        if self.game_running:
-            self.input_queue.put(command)
-            self.update_status(f"Quick action: {command}")
-            
-    def update_status(self, message):
-        """Update status bar"""
-        self.status_bar.config(text=message)
+        """Execute a quick command"""
+        self.command_var.set(command)
+        self.process_command()
         
-    def on_closing(self):
-        """Handle window closing"""
-        if self.game_running:
-            self.stop_game()
-        self.root.destroy()
+    def process_command(self, event=None):
+        """Process user command"""
+        command = self.command_var.get().strip()
+        if not command:
+            return
+            
+        self.display_text(f"> {command}")
+        self.command_var.set("")
+        
+        # Process command with game logic
+        # This would integrate with your existing game
+        response = self.handle_game_command(command)
+        self.display_text(response)
+        
+    def handle_game_command(self, command):
+        """Handle game commands - integrate with your game logic"""
+        # This is where you'd integrate with your existing game
+        # For now, simple responses
+        command = command.lower()
+        
+        if command in ['north', 'south', 'east', 'west']:
+            return f"🧭 You move {command}..."
+        elif command == 'look':
+            return "👁️ You examine your surroundings..."
+        elif command == 'help':
+            return """
+🆘 Available Commands:
+🧭 Movement: north, south, east, west
+👁️ Actions: look, inventory, stats, help
+⚔️ Combat: attack, defend, run
+🎮 Use the buttons for quick actions!
+            """
+        else:
+            return f"❓ Unknown command: '{command}'"
+            
+    def new_game(self):
+        """Start a new game"""
+        self.display_text("🎯 Starting new adventure...")
+        # Integrate with your game's new game logic
+        
+    def save_game(self):
+        """Save current game"""
+        messagebox.showinfo("Save Game", "Game saved successfully!")
+        
+    def load_game(self):
+        """Load saved game"""
+        messagebox.showinfo("Load Game", "Game loaded successfully!")
         
     def run(self):
         """Start the GUI"""
+        self.display_text("🗻 Welcome to SHABUYA Cave Adventure! 🗻")
+        self.display_text("Type 'help' for commands or use the quick action buttons.")
+        self.command_entry.focus()
         self.root.mainloop()
 
 def main():
-    """Launch the GUI"""
-    app = CaveGameGUI()
-    app.run()
+    """Main GUI entry point"""
+    try:
+        app = CaveGameGUI()
+        app.run()
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to start GUI: {e}")
+        # Fallback to text mode
+        try:
+            from game_refactored import main as text_main
+            text_main()
+        except:
+            print("Both GUI and text mode failed. Please check installation.")
 
 if __name__ == "__main__":
     main()
