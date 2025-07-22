@@ -1,4 +1,3 @@
-# README.md
 # 🗻 SHABUYA Cave Adventure
 
 **A Professional Text-Based RPG with Beautiful GUI Interface**
@@ -14,7 +13,22 @@
 ## 🎮 **Download & Play Now**
 
 ### **📥 Step 1: Download**
-**[⬇️ DOWNLOAD SHABUYA-Cave-Adventure-v1.0.zip](https://github.com/yourusername/cave-game/raw/main/SHABUYA-Cave-Adventure-v1.0.zip)**
+Choose your preferred download method:
+
+#### **🎯 Method 1: Direct Download (Recommended)**
+**[⬇️ DOWNLOAD SHABUYA-Cave-Adventure-v1.0.zip](https://github.com/Acowl/cave-game/raw/main/SHABUYA-Cave-Adventure-v1.0.zip)**
+
+#### **📂 Method 2: From Repository**
+1. **[Visit the Repository](https://github.com/Acowl/cave-game)**
+2. **Click** on `SHABUYA-Cave-Adventure-v1.0.zip` in the file list
+3. **Click** the "Download" button
+
+#### **💻 Method 3: Clone Repository**
+```bash
+git clone https://github.com/Acowl/cave-game.git
+cd cave-game/distribution
+python launcher.py
+```
 
 ### **📂 Step 2: Extract**
 - **Windows:** Right-click the ZIP → "Extract All"
@@ -212,7 +226,7 @@ SHABUYA-Cave-Adventure-v1.0.zip
 
 ## 🎉 **Ready to Begin Your Adventure?**
 
-### **[⬇️ Download SHABUYA Cave Adventure v1.0 Now](https://github.com/yourusername/cave-game/raw/main/SHABUYA-Cave-Adventure-v1.0.zip)**
+### **[⬇️ Download SHABUYA Cave Adventure v1.0 Now](https://github.com/Acowl/cave-game/raw/main/SHABUYA-Cave-Adventure-v1.0.zip)**
 
 **Extract • Launch • Explore • Conquer**
 
@@ -220,8 +234,8 @@ SHABUYA-Cave-Adventure-v1.0.zip
 
 ## 📞 **Support & Community**
 
-- 🐛 **Found a bug?** [Report it here](https://github.com/yourusername/cave-game/issues)
-- 💡 **Have suggestions?** [Share your ideas](https://github.com/yourusername/cave-game/discussions)
+- 🐛 **Found a bug?** [Report it here](https://github.com/Acowl/cave-game/issues)
+- 💡 **Have suggestions?** [Share your ideas](https://github.com/Acowl/cave-game/discussions)
 - ⭐ **Enjoyed the game?** Please star this repository!
 - 🤝 **Want to contribute?** Pull requests welcome!
 
