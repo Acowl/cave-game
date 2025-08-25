@@ -26,6 +26,10 @@ SHABUYA Cave Adventure is a turn-based RPG that demonstrates advanced software d
 
 ## 🚀 **Quick Start**
 
+### **📥 Download & Play**
+
+**[⬇️ DOWNLOAD SHABUYA-Cave-Adventure-v1.0.zip](https://github.com/Acowl/cave-game/raw/main/SHABUYA-Cave-Adventure-v1.0.zip)**
+
 ### **Installation & Launch**
 ```bash
 # Download and extract the game
@@ -39,7 +43,7 @@ python main.py --gui       # Direct GUI mode
 python main.py --text      # Classic text mode
 ```
 
-**Windows Users**: Simply double-click `START_GAME.bat`
+**Windows Users**: Simply double-click `START_GAME.bat` after extracting the ZIP file
 
 ---
 
