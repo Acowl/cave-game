@@ -1,245 +1,174 @@
 # 🗻 SHABUYA Cave Adventure
 
-**A Professional Text-Based RPG with Beautiful GUI Interface**
+**A Professional Text-Based RPG with Cross-Platform GUI**
 
-> *Explore the mysterious caves of Mount Shabuya in this epic adventure featuring dual interfaces, strategic combat, and immersive storytelling.*
+> *A comprehensive game development project showcasing object-oriented programming, modular architecture, and cross-platform deployment with dual interface systems.*
 
 ![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
-![License](https://img.shields.io/badge/License-Open%20Source-green.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Version](https://img.shields.io/badge/Version-1.0.0-orange.svg)
 
 ---
 
-## 🎮 **Download & Play Now**
+## � **Project Overview**
 
-### **📥 Step 1: Download**
-Choose your preferred download method:
+SHABUYA Cave Adventure is a turn-based RPG that demonstrates advanced software development practices including modular design patterns, cross-platform deployment, and dual-interface architecture. The project showcases proficiency in Python development, GUI programming with Tkinter, and comprehensive software distribution.
 
-#### **🎯 Method 1: Direct Download (Recommended)**
-**[⬇️ DOWNLOAD SHABUYA-Cave-Adventure-v1.0.zip](https://github.com/Acowl/cave-game/raw/main/SHABUYA-Cave-Adventure-v1.0.zip)**
+### **� Technical Stack**
+- **Language**: Python 3.7+
+- **GUI Framework**: Tkinter (built-in)
+- **Architecture**: Object-Oriented Programming with MVC pattern
+- **Distribution**: Cross-platform executable with automated launcher system
+- **Testing**: Manual testing with automated input validation
 
-#### **📂 Method 2: From Repository**
-1. **[Visit the Repository](https://github.com/Acowl/cave-game)**
-2. **Click** on `SHABUYA-Cave-Adventure-v1.0.zip` in the file list
-3. **Click** the "Download" button
+---
 
-#### **💻 Method 3: Clone Repository**
+## 🚀 **Quick Start**
+
+### **Installation & Launch**
+```bash
+# Download and extract the game
+wget https://github.com/Acowl/cave-game/raw/main/SHABUYA-Cave-Adventure-v1.0.zip
+unzip SHABUYA-Cave-Adventure-v1.0.zip
+cd distribution
+
+# Launch the game
+python launcher.py          # Professional GUI launcher
+python main.py --gui       # Direct GUI mode  
+python main.py --text      # Classic text mode
+```
+
+**Windows Users**: Simply double-click `START_GAME.bat`
+
+---
+
+## 🏗️ **Software Architecture**
+
+### **Core Components**
+```
+� Game Engine
+├── 🎮 game_refactored.py    # Main game loop and scene orchestration
+├── 🗺️ scenes.py            # Scene management and world state
+├── ⚔️ combat.py             # Turn-based combat system
+├── 👤 player.py             # Character progression and stats
+├── 🎒 item.py               # Inventory and weapon systems
+├── �️ gui.py                # Professional Tkinter interface
+├── 📝 ui.py                 # Console interface utilities
+└── ⚙️ config.py             # Centralized configuration
+```
+
+### **Key Features Implemented**
+- **Dual Interface System**: Professional GUI with fallback to text mode
+- **Modular Architecture**: Clean separation of concerns across multiple modules  
+- **Cross-Platform Distribution**: Automated launcher with environment detection
+- **Object-Oriented Design**: Player, Scene, Item, and Combat classes
+- **State Management**: Persistent game state across scenes and battles
+- **Error Handling**: Comprehensive exception handling and user feedback
+
+---
+
+## 🎮 **Gameplay Features**
+
+### **Character System**
+- **Three Classes**: Warrior (Axe), Rogue (Dagger), Mage (Wand)
+- **Stat Progression**: Strength, Agility, Intelligence, Vitality
+- **Dynamic Level Scaling**: Point allocation system with strategic choices
+
+### **Game World**
+- **Scene-Based Navigation**: Cave Entrance → Skull Chamber → Primitive Village
+- **Access Control**: Key-based progression system
+- **Interactive Environments**: Multiple paths and hidden areas
+- **Boss Encounters**: Strategic combat with scaling difficulty
+
+### **Combat Mechanics**
+- **Weapon Effectiveness**: Rock-paper-scissors style combat system
+- **Enhanced Weapons**: Legendary variants with stat requirements
+- **Class Abilities**: Unique special attacks (Shadow Strike, Berserker Rage, Strategic Analysis)
+- **Victory Conditions**: Multiple paths to success based on player choices
+
+---
+
+## � **Development Highlights**
+
+### **Software Engineering Practices**
+- **Clean Code**: PEP 8 compliance with comprehensive docstrings
+- **Error Handling**: Graceful degradation and user-friendly error messages
+- **Input Validation**: Robust user input processing with multiple valid formats
+- **Cross-Platform Compatibility**: Works seamlessly on Windows, macOS, and Linux
+
+### **Technical Achievements**
+- **Dual Interface Implementation**: Tkinter GUI with terminal fallback
+- **Modular Design**: Each system component can be independently modified
+- **Distribution System**: Complete packaging with automated launchers
+- **Professional Polish**: Comprehensive user documentation and troubleshooting guides
+
+---
+
+## 📊 **Project Statistics**
+
+| Metric | Value |
+|--------|-------|
+| **Total Lines of Code** | ~2,000+ |
+| **Python Modules** | 8 core modules |
+| **Game Scenes** | 8 unique locations |
+| **Character Classes** | 3 with unique abilities |
+| **Platforms Supported** | Windows, macOS, Linux |
+| **Interface Types** | GUI + Text modes |
+
+---
+
+## 🛠️ **System Requirements**
+
+- **Python**: 3.7 or higher
+- **Memory**: 100MB RAM minimum  
+- **Storage**: 50MB free space
+- **OS**: Windows 10+, macOS 10.14+, or Linux with X11
+
+---
+
+## 📋 **Installation Guide**
+
+### **Method 1: Download Release (Recommended)**
+1. Download `SHABUYA-Cave-Adventure-v1.0.zip`
+2. Extract to desired location
+3. Navigate to `distribution/` folder
+4. Run appropriate launcher for your platform
+
+### **Method 2: Clone Repository**
 ```bash
 git clone https://github.com/Acowl/cave-game.git
-cd cave-game/distribution
-python launcher.py
-```
-
-### **📂 Step 2: Extract**
-- **Windows:** Right-click the ZIP → "Extract All"
-- **Mac:** Double-click the ZIP file
-- **Linux:** `unzip SHABUYA-Cave-Adventure-v1.0.zip`
-
-### **🚀 Step 3: Launch**
-Navigate to the `distribution` folder and:
-
-| Platform | Method 1 (Easiest) | Method 2 (Alternative) |
-|----------|-------------------|------------------------|
-| **Windows** | Double-click `START_GAME.bat` | `python launcher.py` |
-| **Mac/Linux** | Run `./start_game.sh` | `python3 launcher.py` |
-| **Any Platform** | | `python main.py` |
-
-**That's it! No installation, no setup, just extract and play!** 🎉
-
----
-
-## ✨ **Game Features**
-
-### 🎯 **Dual Interface Experience**
-- **🖥️ GUI Mode** - Professional desktop application with buttons, menus, and visual feedback
-- **📝 Text Mode** - Classic terminal-based adventure for purists
-- **🎮 Smart Launcher** - Automatically detects and launches the best mode for your system
-
-### 🏛️ **Choose Your Destiny**
-| Class | Combat Style | Special Abilities |
-|-------|-------------|------------------|
-| ⚔️ **Warrior** | Melee powerhouse | High damage, defensive skills |
-| 🗡️ **Rogue** | Swift & deadly | Critical strikes, stealth |
-| 🧙 **Mage** | Arcane mastery | Elemental magic, spell variety |
-
-### 🎲 **Rich Gameplay**
-- **📊 Character Progression** - Level up and customize your stats
-- **🎒 Inventory Management** - Collect weapons, keys, and treasures
-- **🗺️ Cave Exploration** - Multiple interconnected areas to discover
-- **⚔️ Strategic Combat** - Turn-based battles with class-specific abilities
-- **🌟 Epic Boss Fights** - Face the legendary Guardian of Mount Shabuya
-
----
-
-## 📋 **System Requirements**
-
-### **Minimum Requirements:**
-- **Python 3.7+** *(Download from [python.org](https://python.org))*
-- **Operating System:** Windows 10+, macOS 10.14+, or Linux
-- **Storage:** 50MB free space
-- **Memory:** 100MB RAM
-
-### **What's Included:**
-✅ Complete game with all features  
-✅ Professional GUI launcher  
-✅ Cross-platform start scripts  
-✅ Comprehensive player guide  
-✅ **No additional software required!**
-
----
-
-## 🎮 **How to Play**
-
-### **🌟 Getting Started**
-1. **Launch** the game using your platform's method above
-2. **Choose your class** - Each offers a unique play experience
-3. **Create your character** - Pick a name and begin your journey
-4. **Explore the caves** - Use movement commands or GUI buttons
-
-### **🕹️ Game Controls**
-
-#### **GUI Mode (Recommended):**
-- **Click buttons** for all actions - movement, combat, inventory
-- **Real-time stats** displayed on screen
-- **Quick actions** available with single clicks
-- **Visual feedback** for all game events
-
-#### **Text Mode (Classic):**
-- **Movement:** `north`, `south`, `east`, `west` (or `n`, `s`, `e`, `w`)
-- **Actions:** `look`, `inventory`, `stats`, `help`
-- **Combat:** `attack`, `defend`, `run`
-- **Type commands** and press Enter
-
-### **⚔️ Combat Guide**
-- **Study your enemies** - Each has unique strengths and weaknesses
-- **Use class abilities** - Warriors tank, Rogues strike fast, Mages cast spells
-- **Manage resources** - Health and magic are precious in the depths
-- **Strategic retreat** - Sometimes running away is the smart choice
-
----
-
-## 🏆 **Game Objectives**
-
-### **Primary Goals:**
-- 🗺️ **Explore** all areas of Mount Shabuya's cave system
-- ⚔️ **Defeat** the Guardian of Mount Shabuya
-- 💎 **Collect** legendary treasures and powerful artifacts
-- 📈 **Reach** maximum character level
-
-### **Victory Conditions:**
-- Successfully defeat the final boss
-- Survive the deepest cave chambers
-- Master your chosen class abilities
-- Uncover the secrets of Mount Shabuya
-
----
-
-## 🛠️ **Troubleshooting**
-
-### **"Python not found" Error:**
-1. **Download Python** from [python.org](https://python.org)
-2. **During installation:** Check "Add Python to PATH"
-3. **Restart** your computer
-4. **Test:** Open terminal/command prompt, type `python --version`
-
-### **GUI Not Working:**
-```bash
-# Try text mode instead:
-cd distribution
-python main.py --text
-```
-
-**For missing tkinter:**
-- **Windows:** Reinstall Python, ensure "tcl/tk" option is checked
-- **Linux:** `sudo apt-get install python3-tk`
-- **Mac:** `brew install python-tk`
-
-### **Permission Denied (Mac/Linux):**
-```bash
-chmod +x distribution/start_game.sh
-./distribution/start_game.sh
-```
-
-### **Files Missing:**
-- **Re-extract** the ZIP file completely
-- **Ensure** all files are in the `distribution` folder
-- **Check** that you have `main.py`, `launcher.py`, and other game files
-
----
-
-## 📦 **What's in the Download**
-
-```
-SHABUYA-Cave-Adventure-v1.0.zip
-└── distribution/
-    ├── 🎮 START_GAME.bat         # Windows double-click launcher
-    ├── 🐧 start_game.sh          # Mac/Linux script launcher
-    ├── 🖥️ launcher.py            # Professional GUI launcher
-    ├── 📝 main.py               # Direct game launcher
-    ├── 🎨 gui.py                # Beautiful GUI interface
-    ├── 🎯 game_refactored.py     # Main game engine
-    ├── ⚔️ combat.py              # Battle system
-    ├── 🗺️ scenes.py              # Cave areas & encounters
-    ├── 🎒 item.py               # Weapons & inventory
-    ├── 👤 player.py             # Character system
-    ├── 🖼️ ui.py                 # Interface utilities
-    ├── ⚙️ config.py             # Game settings
-    ├── 📖 README.txt            # Player instructions
-    └── 📋 requirements.txt       # Technical details
+cd cave-game
+python main.py
 ```
 
 ---
 
-## 🌟 **The Story**
+## 🎯 **Future Development**
 
-*Deep within Mount Shabuya lie ancient caves that have remained sealed for centuries. Legends speak of incredible treasures hidden in the depths, but also of a terrible Guardian that protects them.*
-
-*As a brave adventurer, you've decided to explore these mysterious caves. Your choice of class - Warrior, Rogue, or Mage - will determine not just how you fight, but how you experience this epic journey.*
-
-*Will you emerge victorious with legendary treasures, or become another lost soul in the endless darkness of Mount Shabuya?*
-
-**Your adventure begins now...**
-
----
-
-## 🎯 **Why Choose SHABUYA Cave Adventure?**
-
-### ✅ **Professional Quality**
-- **Polished interface** with both GUI and text modes
-- **Comprehensive documentation** and troubleshooting support
-- **Cross-platform compatibility** - works on Windows, Mac, and Linux
-- **No installation hassles** - just extract and play
-
-### ✅ **Rich Gameplay**
-- **Multiple character classes** with unique abilities
-- **Strategic combat system** requiring tactical thinking
-- **Immersive storytelling** with atmospheric descriptions
-- **Replayability** - different experiences with each class
-
-### ✅ **Technical Excellence**
-- **Lightweight** - only 25KB download size
-- **Fast loading** - starts instantly
-- **Stable performance** - thoroughly tested
-- **Open source** - modify and learn from the code
+### **Planned Enhancements**
+- **Save System**: Persistent game state across sessions
+- **Extended Story**: Additional cave systems and boss encounters  
+- **Enhanced GUI**: Character portraits and animated combat
+- **Multiplayer**: Turn-based cooperative gameplay
+- **Modding Support**: JSON-based scene and item configuration
 
 ---
 
-## 🎉 **Ready to Begin Your Adventure?**
+## 📞 **Contact & Support**
 
-### **[⬇️ Download SHABUYA Cave Adventure v1.0 Now](https://github.com/Acowl/cave-game/raw/main/SHABUYA-Cave-Adventure-v1.0.zip)**
-
-**Extract • Launch • Explore • Conquer**
-
----
-
-## 📞 **Support & Community**
-
-- 🐛 **Found a bug?** [Report it here](https://github.com/Acowl/cave-game/issues)
-- 💡 **Have suggestions?** [Share your ideas](https://github.com/Acowl/cave-game/discussions)
-- ⭐ **Enjoyed the game?** Please star this repository!
-- 🤝 **Want to contribute?** Pull requests welcome!
+- **Repository**: [GitHub Project](https://github.com/Acowl/cave-game)
+- **Issues**: [Bug Reports & Feature Requests](https://github.com/Acowl/cave-game/issues)
+- **Version**: 1.0.0 (Initial Release)
 
 ---
 
-**Made with ❤️ for adventure game enthusiasts**  
-*© 2025 SHABUYA Development Team • Happy Adventuring! 🗻⚔️✨*
+## 📄 **License**
+
+This project is open-source software released under the MIT License. See the LICENSE file for details.
+
+---
+
+**Developed as a portfolio project demonstrating Python game development, GUI programming, and software distribution best practices.**
+
+*This project showcases comprehensive software development skills including object-oriented design, cross-platform compatibility, user interface development, and professional documentation practices.*

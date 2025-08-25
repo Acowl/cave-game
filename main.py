@@ -371,19 +371,17 @@ def main():
         if "--debug" in sys.argv:
             print_system_info()
         
-        # Determine launch mode
+        # Determine launch mode - PRIORITIZE WORKING TEXT MODE
         force_text_mode = "--text" in sys.argv
+        force_gui_mode = "--gui" in sys.argv
         
-        if force_text_mode:
-            print("🖥️  TEXT MODE (forced via --text flag)")
-            success = run_text_mode()
-        else:
-            # Check GUI availability
+        if force_gui_mode and not force_text_mode:
+            # Only try GUI if explicitly requested and text mode not forced
             display_available = is_display_available()
             gui_available, gui_status = is_gui_available()
             
             if display_available and gui_available:
-                print("🎮 Attempting GUI mode...")
+                print("🎮 GUI MODE (forced via --gui flag)")
                 gui_success = run_gui_mode()
                 
                 if gui_success:
@@ -392,21 +390,17 @@ def main():
                 print("🔄 GUI failed - falling back to text mode...")
                 success = run_text_mode()
             else:
-                # Explain why GUI isn't available
-                if not display_available:
-                    print("🖥️  No display detected (headless environment)")
-                    print("💡 Use a local machine or enable X11 forwarding for GUI")
-                else:
-                    print(f"🖥️  GUI unavailable: {gui_status}")
-                
-                print("🖥️  Starting in TEXT mode...")
-                if gui_available and not display_available:
-                    print("💡 GUI files ready - just need a display")
-                elif display_available and not gui_available:
-                    print("💡 Install tkinter and ensure gui.py exists for GUI mode")
-                print()
-                
+                print(f"🖥️  GUI unavailable: {gui_status}")
+                print("� Falling back to text mode...")
                 success = run_text_mode()
+        else:
+            # Default to reliable text mode (unless GUI specifically requested)
+            if force_text_mode:
+                print("🖥️  TEXT MODE (forced via --text flag)")
+            else:
+                print("�️  STARTING GAME (text interface)")
+                print("💡 Use --gui flag to attempt GUI mode")
+            success = run_text_mode()
         
         # Final status
         if success:
