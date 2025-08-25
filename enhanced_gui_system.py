@@ -300,8 +300,63 @@ class EnhancedGameGUI(BaseGUI):
                 # Set default sprite
                 if 'warrior' in self.character_sprites:
                     self.character_sprite_label.config(image=self.character_sprites['warrior'])
+            
+            # Add background display to game area
+            self.add_background_display()
+            
         except Exception as e:
             print(f"Could not add graphics overlay: {e}")
+    
+    def add_background_display(self):
+        """Add background image display to the main game area"""
+        try:
+            # Find the game display area and add background
+            if hasattr(self, 'game_display'):
+                # Create a canvas for background behind the text
+                self.bg_canvas = tk.Canvas(self.game_display.master, 
+                                          width=400, height=300, 
+                                          bg='#1a0f08', highlightthickness=0)
+                self.bg_canvas.pack(before=self.game_display, pady=(0, 10))
+                
+                # Set default background (menu)
+                if 'menu' in self.background_images:
+                    self.bg_canvas.create_image(200, 150, 
+                                              image=self.background_images['menu'])
+                    self.current_background = 'menu'
+                else:
+                    # Fallback to solid color
+                    self.bg_canvas.create_rectangle(0, 0, 400, 300, 
+                                                   fill='#2c1810', outline='')
+                
+        except Exception as e:
+            print(f"Could not add background display: {e}")
+    
+    def update_scene_background(self, scene_name: str):
+        """Update background image based on current scene"""
+        if not self.graphics_loaded or not hasattr(self, 'bg_canvas'):
+            return
+        
+        # Map scene names to background files
+        scene_bg_map = {
+            'Cave Entrance': 'cave_entrance',
+            'Skull Chamber': 'skull_chamber', 
+            'Primitive Village': 'primitive_village',
+            'Alley': 'primitive_village',  # Reuse village background
+            'Armory': 'cave_entrance',     # Reuse cave background
+            'Cave People Chief House': 'primitive_village',
+            'Healing Pool': 'cave_entrance'
+        }
+        
+        bg_key = scene_bg_map.get(scene_name, 'menu')
+        
+        if bg_key in self.background_images and bg_key != getattr(self, 'current_background', None):
+            # Clear canvas and set new background
+            self.bg_canvas.delete("all")
+            self.bg_canvas.create_image(200, 150, 
+                                       image=self.background_images[bg_key])
+            self.current_background = bg_key
+            print(f"🖼️ Background changed to: {bg_key}")
+    
     
     def add_settings_menu(self):
         """Add enhanced settings menu"""
@@ -428,6 +483,96 @@ class EnhancedGameGUI(BaseGUI):
             # Show first steps achievement
             if not self.steam.steam.is_achievement_unlocked("FIRST_STEPS"):
                 self.show_achievement_notification("First Steps")
+    
+    def display_text(self, text):
+        """Enhanced text display with scene detection"""
+        # Call the parent method to display text
+        super().display_text(text)
+        
+        # Check if text contains scene information and update background
+        self.detect_and_update_scene(text)
+    
+    def detect_and_update_scene(self, text):
+        """Detect current scene from game text and update background"""
+        try:
+            # Scene detection patterns
+            scene_patterns = [
+                ('Cave Entrance', ['cave entrance', 'rocky entrance', 'mouth of the cave']),
+                ('Skull Chamber', ['skull chamber', 'chamber of skulls', 'ominous chamber']),
+                ('Primitive Village', ['primitive village', 'village', 'huts', 'cave people']),
+                ('Alley', ['alley', 'dark alley', 'narrow alley']),
+                ('Armory', ['armory', 'weapon shop', 'weapons']),
+                ('Cave People Chief House', ['chief house', 'chief', 'leader'])
+            ]
+            
+            text_lower = text.lower()
+            
+            for scene_name, keywords in scene_patterns:
+                if any(keyword in text_lower for keyword in keywords):
+                    self.update_scene_background(scene_name)
+                    break
+                    
+        except Exception as e:
+            print(f"Scene detection error: {e}")
+    
+    def create_demo_graphics_test(self):
+        """Create a simple graphics test window"""
+        try:
+            test_window = tk.Toplevel(self.root)
+            test_window.title("Graphics Test - SHABUYA Assets")
+            test_window.geometry("600x500")
+            test_window.configure(bg='#1a0f08')
+            
+            # Test sprites
+            sprite_frame = tk.LabelFrame(test_window, text="Character Sprites", 
+                                       fg='#DAA520', bg='#2c1810')
+            sprite_frame.pack(pady=10, padx=10, fill=tk.X)
+            
+            sprite_row = tk.Frame(sprite_frame, bg='#2c1810')
+            sprite_row.pack(pady=10)
+            
+            for name, sprite in self.character_sprites.items():
+                col = tk.Frame(sprite_row, bg='#2c1810')
+                col.pack(side=tk.LEFT, padx=10)
+                
+                tk.Label(col, image=sprite, bg='#2c1810').pack()
+                tk.Label(col, text=name.title(), fg='#CD853F', 
+                        bg='#2c1810').pack()
+            
+            # Test backgrounds
+            bg_frame = tk.LabelFrame(test_window, text="Scene Backgrounds", 
+                                   fg='#DAA520', bg='#2c1810')
+            bg_frame.pack(pady=10, padx=10, fill=tk.BOTH, expand=True)
+            
+            # Background display canvas
+            bg_canvas = tk.Canvas(bg_frame, width=400, height=300, 
+                                bg='#1a0f08', highlightthickness=0)
+            bg_canvas.pack(pady=10)
+            
+            # Background selection buttons
+            button_frame = tk.Frame(bg_frame, bg='#2c1810')
+            button_frame.pack()
+            
+            def show_background(bg_name):
+                if bg_name in self.background_images:
+                    bg_canvas.delete("all")
+                    bg_canvas.create_image(200, 150, 
+                                         image=self.background_images[bg_name])
+            
+            for bg_name in self.background_images.keys():
+                tk.Button(button_frame, text=bg_name.replace('_', ' ').title(),
+                         command=lambda name=bg_name: show_background(name),
+                         bg='#8B4513', fg='white', font=("Arial", 9)).pack(
+                         side=tk.LEFT, padx=5)
+            
+            # Show first background by default
+            if self.background_images:
+                first_bg = list(self.background_images.keys())[0]
+                show_background(first_bg)
+            
+        except Exception as e:
+            print(f"Graphics test error: {e}")
+    
 
 def main():
     """Main entry point for enhanced GUI"""

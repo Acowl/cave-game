@@ -1,0 +1,31 @@
+{
+  "asset_creation_info": {
+    "created_date": "2025-08-25",
+    "style": "Simple Programmer Art",
+    "resolution": "64x64 sprites, 400x300 backgrounds",
+    "format": "PNG with transparency support"
+  },
+  "sprites": {
+    "warrior_sprite.png": "Tank class - brown/gold color scheme",
+    "rogue_sprite.png": "Agility class - green color scheme",
+    "mage_sprite.png": "Magic class - purple color scheme",
+    "enemy_sprite.png": "Generic enemy - red color scheme"
+  },
+  "backgrounds": {
+    "cave_entrance.png": "Rocky entrance with stone formations",
+    "skull_chamber.png": "Dark mysterious chamber",
+    "primitive_village.png": "Village with hut structures",
+    "menu.png": "Main menu decorative background"
+  },
+  "icons": {
+    "shabuya_icon.png": "Game icon - mountain with cave opening",
+    "shabuya_icon.ico": "Windows format game icon"
+  },
+  "usage_notes": [
+    "All sprites are 64x64 PNG with transparency",
+    "All backgrounds are 400x300 PNG without transparency",
+    "Colors chosen for good contrast and readability",
+    "Assets can be easily replaced with higher quality art later",
+    "Compatible with enhanced_gui_system.py loading functions"
+  ]
+}
