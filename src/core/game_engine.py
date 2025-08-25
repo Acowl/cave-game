@@ -262,7 +262,7 @@ def handle_alley(player, current_scene, scenes, game_state):
             if chosen_weapon == "quit":
                 return {'action': 'quit'}
             
-            success, message = execute_weapon_attack(player, chosen_weapon, "alley_creature")
+            success, message = execute_weapon_attack(player, chosen_weapon)
             print()
             print(message)
             
@@ -373,7 +373,7 @@ def handle_chief_house(player, current_scene, scenes, game_state):
         if chosen_weapon == "quit":
             return {'action': 'quit'}
         
-        success, message = execute_weapon_attack(player, chosen_weapon, "chief")
+        success, message = execute_weapon_attack(player, chosen_weapon)
         print()
         print(message)
         
@@ -501,7 +501,7 @@ def handle_final_boss(player, current_scene, scenes):
         if chosen_weapon == "quit":
             return {'action': 'quit'}
         
-        success, message = execute_weapon_attack(player, chosen_weapon, "divine_heart")
+        success, message = execute_weapon_attack(player, chosen_weapon)
         print()
         print(message)
         
