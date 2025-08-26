@@ -30,10 +30,10 @@ Based on codebase analysis, here's the complete list of all sprites and graphics
 ### 👾 **Enemy Sprites (64x64 PNG with transparency)**
 
 #### **Primary Enemies:**
-1. **`alley_creature_sprite.png`** 
-   - **Description**: Ground-dwelling primitive creature that bursts from burrows
-   - **Appearance**: Small, agile, earth-toned creature with claws
-   - **AI Prompt**: `pixel art alley creature sprite, 64x64 pixels, primitive ground-dwelling monster, earth brown colors, burrow creature with claws, RPG enemy sprite, transparent background, retro gaming style`
+1. **`primitive_creature_sprite.png`** 
+   - **Description**: Ground-dwelling primitive creature that appears in alley and skull chamber
+   - **Appearance**: Small, agile, earth-toned creature with claws that bursts from burrows
+   - **AI Prompt**: `pixel art primitive creature sprite, 64x64 pixels, primitive ground-dwelling monster, earth brown colors, burrow creature with claws, RPG enemy sprite, transparent background, retro gaming style`
 
 2. **`divine_heart_sprite.png`** 
    - **Description**: Final boss - cosmic horror entity
@@ -41,12 +41,7 @@ Based on codebase analysis, here's the complete list of all sprites and graphics
    - **AI Prompt**: `pixel art divine heart boss sprite, 64x64 pixels, cosmic horror final boss, pulsing heart entity, cosmic energy aura, dark purple and red colors, RPG boss sprite, transparent background, retro gaming aesthetic`
 
 #### **Additional Enemy Variants:**
-3. **`primitive_creature_sprite.png`**
-   - **Description**: Skull chamber creature (mentioned in story)
-   - **Appearance**: Shadowy primitive humanoid 
-   - **AI Prompt**: `pixel art primitive creature sprite, 64x64 pixels, shadowy humanoid creature, cave dweller, dark gray colors, primitive tribal appearance, RPG enemy sprite, transparent background`
-
-4. **`cave_guardian_sprite.png`**
+3. **`cave_guardian_sprite.png`**
    - **Description**: Armory guardian/protector enemy
    - **Appearance**: Stone/bone armored guardian
    - **AI Prompt**: `pixel art cave guardian sprite, 64x64 pixels, stone and bone armored guardian, ancient protector, gray and tan colors, RPG guardian enemy, transparent background, retro gaming style`
@@ -112,7 +107,7 @@ Based on codebase analysis, here's the complete list of all sprites and graphics
 ## 🎯 **PRIORITY IMPLEMENTATION ORDER**
 
 ### **Phase 1: Critical Missing Assets (High Priority)**
-1. `alley_creature_sprite.png` - Primary enemy
+1. `primitive_creature_sprite.png` - Primary enemy (appears in alley and skull chamber)
 2. `divine_heart_sprite.png` - Final boss
 3. `alley.png` - Major combat scene
 4. `armory.png` - Important location
@@ -121,7 +116,7 @@ Based on codebase analysis, here's the complete list of all sprites and graphics
 ### **Phase 2: Scene Completion (Medium Priority)**
 6. `healing_pool.png` - Healing location
 7. `village_changed.png` - End game scene
-8. `primitive_creature_sprite.png` - Additional enemy
+8. `cave_guardian_sprite.png` - Additional enemy
 
 ### **Phase 3: UI Enhancement (Lower Priority)**
 9. Weapon icons (6 total)

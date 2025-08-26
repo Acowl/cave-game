@@ -152,14 +152,13 @@ def interactive_asset_replacement():
             print("- mage")
             print("=== ENEMIES ===")
             print("- enemy (generic)")
-            print("- alley_creature")
-            print("- divine_heart")
             print("- primitive_creature")
+            print("- divine_heart")
             print("- cave_guardian")
             
             sprite_name = input("Enter sprite name: ").strip().lower()
-            valid_sprites = ["warrior", "rogue", "mage", "enemy", "alley_creature", 
-                           "divine_heart", "primitive_creature", "cave_guardian"]
+            valid_sprites = ["warrior", "rogue", "mage", "enemy", "primitive_creature", 
+                           "divine_heart", "cave_guardian"]
             
             if sprite_name in valid_sprites:
                 image_path = input("Enter path to your AI-generated sprite image: ").strip()
