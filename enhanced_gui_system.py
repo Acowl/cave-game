@@ -127,10 +127,15 @@ class EnhancedGameGUI(BaseGUI):
             self.create_default_sprites(sprite_dir)
         
         sprite_files = {
+            # Player character sprites
             'warrior': 'warrior_sprite.png',
             'rogue': 'rogue_sprite.png', 
             'mage': 'mage_sprite.png',
-            'enemy': 'enemy_sprite.png'
+            # Enemy sprites
+            'enemy': 'enemy_sprite.png',
+            'primitive_creature': 'primitive_creature_sprite.png',
+            'divine_heart': 'divine_heart_sprite.png',
+            'cave_guardian': 'cave_guardian_sprite.png'
         }
         
         for sprite_name, filename in sprite_files.items():
@@ -149,10 +154,15 @@ class EnhancedGameGUI(BaseGUI):
             from PIL import Image, ImageDraw
             
             sprite_configs = {
+                # Player characters
                 'warrior': {'color': '#8B4513', 'symbol': '🛡️'},
                 'rogue': {'color': '#2F4F2F', 'symbol': '🗡️'},
                 'mage': {'color': '#4B0082', 'symbol': '🔮'},
-                'enemy': {'color': '#8B0000', 'symbol': '👹'}
+                # Enemy sprites
+                'enemy': {'color': '#8B0000', 'symbol': '👹'},
+                'primitive_creature': {'color': '#A0522D', 'symbol': '🦎'},
+                'divine_heart': {'color': '#4B0082', 'symbol': '💜'},
+                'cave_guardian': {'color': '#696969', 'symbol': '🗿'}
             }
             
             for name, config in sprite_configs.items():

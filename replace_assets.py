@@ -79,11 +79,38 @@ def test_updated_assets():
     """Test the updated assets in the enhanced GUI"""
     print(f"\n🧪 Testing updated assets...")
     
+    # First check what files exist
+    from pathlib import Path
+    
+    print("  📁 Checking asset files...")
+    sprite_dir = Path("game_assets/sprites")
+    if sprite_dir.exists():
+        print("  Character Sprites:")
+        sprite_files = ['warrior_sprite.png', 'rogue_sprite.png', 'mage_sprite.png', 
+                       'enemy_sprite.png', 'primitive_creature_sprite.png', 
+                       'divine_heart_sprite.png', 'cave_guardian_sprite.png']
+        for sprite_file in sprite_files:
+            sprite_path = sprite_dir / sprite_file
+            status = "✅ EXISTS" if sprite_path.exists() else "❌ MISSING"
+            print(f"    - {sprite_file}: {status}")
+    
+    bg_dir = Path("game_assets/backgrounds")
+    if bg_dir.exists():
+        print("  Scene Backgrounds:")
+        bg_files = ['cave_entrance.png', 'skull_chamber.png', 'primitive_village.png', 
+                   'menu.png', 'alley.png', 'armory.png', 'chief_house.png', 
+                   'healing_pool.png', 'village_changed.png']
+        for bg_file in bg_files:
+            bg_path = bg_dir / bg_file
+            status = "✅ EXISTS" if bg_path.exists() else "❌ MISSING"
+            print(f"    - {bg_file}: {status}")
+    
+    # Now test GUI loading
     try:
         import tkinter as tk
         from enhanced_gui_system import EnhancedGameGUI
         
-        print("  Creating test window...")
+        print("\n  🖥️  Creating test window...")
         root = tk.Tk()
         root.title("SHABUYA - Asset Test")
         root.geometry("700x500")
@@ -91,29 +118,40 @@ def test_updated_assets():
         gui = EnhancedGameGUI(root)
         gui.setup_graphics()
         
-        # Show asset counts
+        # Show detailed asset counts
         sprite_count = len(gui.character_sprites)
         bg_count = len(gui.background_images)
         
         print(f"  ✅ Loaded {sprite_count} character sprites")
         print(f"  ✅ Loaded {bg_count} backgrounds")
         
-        # Add test interface
-        tk.Label(root, text="🎨 Updated Assets Test", 
+        # List loaded sprites
+        print("  📋 Loaded sprites:")
+        for sprite_name in gui.character_sprites.keys():
+            print(f"    - {sprite_name}")
+        
+        # Add enhanced test interface
+        tk.Label(root, text="🎨 SHABUYA Asset Test", 
                 font=("Arial", 16, "bold")).pack(pady=10)
         
-        tk.Label(root, text=f"Sprites: {sprite_count} | Backgrounds: {bg_count}",
+        tk.Label(root, text=f"Character Sprites: {sprite_count} | Scene Backgrounds: {bg_count}",
                 font=("Arial", 12)).pack()
         
-        tk.Button(root, text="Open Graphics Demo", 
-                 command=gui.create_demo_graphics_test,
-                 bg="#8B4513", fg="white", font=("Arial", 12)).pack(pady=20)
+        # Show which sprites are loaded
+        loaded_sprites = ", ".join(gui.character_sprites.keys())
+        tk.Label(root, text=f"Loaded: {loaded_sprites}", 
+                font=("Arial", 10), wraplength=600).pack(pady=5)
         
-        tk.Button(root, text="Close Test", 
+        tk.Button(root, text="🎮 Open Graphics Demo", 
+                 command=gui.create_demo_graphics_test,
+                 bg="#8B4513", fg="white", font=("Arial", 12, "bold")).pack(pady=20)
+        
+        tk.Button(root, text="❌ Close Test", 
                  command=root.destroy,
                  bg="#654321", fg="white", font=("Arial", 12)).pack()
         
-        print("  🖥️  Test window opened - check the graphics!")
+        print("  🎯 Test window opened - check the graphics demo!")
+        print("  💡 Click 'Open Graphics Demo' to see all loaded sprites")
         root.mainloop()
         
         return True
