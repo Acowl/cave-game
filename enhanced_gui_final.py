@@ -21,8 +21,8 @@ class EnhancedGameGUI:
         self.root.configure(bg='#0a0a0a')
         
         # Asset paths
-        self.sprites_dir = "/workspaces/cave-game/assets/sprites"
-        self.backgrounds_dir = "/workspaces/cave-game/assets/backgrounds"
+        self.sprites_dir = "assets/sprites"
+        self.backgrounds_dir = "assets/backgrounds"
         
         # Character to Sprite Mapping
         self.CHARACTER_SPRITE_MAP = {
@@ -237,7 +237,7 @@ class EnhancedGameGUI:
                     break
         
         # Draw UI info
-        self.canvas.create_rectangle(10, 10, 350, 90, fill='#000000cc', outline='#ffffff')
+        self.canvas.create_rectangle(10, 10, 350, 90, fill='#333333', outline='#ffffff')
         self.canvas.create_text(20, 25, anchor=tk.W, 
                                text=f"Scene: {self.current_scene.replace('_', ' ').title()}", 
                                fill='#88ccff', font=('Arial', 12, 'bold'))
