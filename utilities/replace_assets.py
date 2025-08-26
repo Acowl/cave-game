@@ -33,16 +33,22 @@ def validate_and_resize_image(image_path, target_size, output_path):
         print(f"  ❌ Error processing {image_path}: {e}")
         return False
 
+def get_project_root():
+    """Get the project root directory from script location"""
+    script_dir = Path(__file__).parent
+    return script_dir.parent
+
 def replace_character_sprite(sprite_name, new_image_path):
     """Replace a character sprite with AI-generated version"""
     print(f"\n🧙 Replacing {sprite_name} sprite...")
     
-    # Define target path
-    target_path = Path("../game_assets/sprites/{sprite_name}_sprite.png")
+    # Define target path using project root
+    project_root = get_project_root()
+    target_path = project_root / "game_assets" / "sprites" / f"{sprite_name}_sprite.png"
     
     # Create backup
     if target_path.exists():
-        backup_path = Path("../game_assets/sprites/backup_{sprite_name}_sprite.png")
+        backup_path = project_root / "game_assets" / "sprites" / f"backup_{sprite_name}_sprite.png"
         shutil.copy2(target_path, backup_path)
         print(f"  💾 Backed up original to: {backup_path}")
     
@@ -58,8 +64,9 @@ def replace_scene_background(scene_name, new_image_path):
     """Replace a scene background with AI-generated version"""
     print(f"\n🏔️  Replacing {scene_name} background...")
     
-    # Define target path
-    target_path = Path("../game_assets/backgrounds/{scene_name}.png")
+    # Define target path using project root
+    project_root = get_project_root()
+    target_path = project_root / "game_assets" / "backgrounds" / f"{scene_name}.png"
     
     # Create backup
     if target_path.exists():
@@ -83,7 +90,8 @@ def test_updated_assets():
     from pathlib import Path
     
     print("  📁 Checking asset files...")
-    sprite_dir = Path("../game_assets/sprites")
+    project_root = get_project_root()
+    sprite_dir = project_root / "game_assets" / "sprites"
     if sprite_dir.exists():
         print("  Character Sprites:")
         sprite_files = ['warrior_sprite.png', 'rogue_sprite.png', 'mage_sprite.png', 
@@ -94,7 +102,7 @@ def test_updated_assets():
             status = "✅ EXISTS" if sprite_path.exists() else "❌ MISSING"
             print(f"    - {sprite_file}: {status}")
     
-    bg_dir = Path("../game_assets/backgrounds")
+    bg_dir = project_root / "game_assets" / "backgrounds"
     if bg_dir.exists():
         print("  Scene Backgrounds:")
         bg_files = ['cave_entrance.png', 'skull_chamber.png', 'primitive_village.png', 
@@ -108,6 +116,18 @@ def test_updated_assets():
     # Now test GUI loading
     try:
         import tkinter as tk
+        import sys
+        import os
+        
+        # Add project directory to path for imports
+        project_root = get_project_root()
+        if str(project_root) not in sys.path:
+            sys.path.insert(0, str(project_root))
+        
+        # Force reimport of enhanced GUI system
+        if 'enhanced_gui_system' in sys.modules:
+            del sys.modules['enhanced_gui_system']
+        
         from enhanced_gui_system import EnhancedGameGUI
         
         print("\n  🖥️  Creating test window...")
@@ -116,7 +136,17 @@ def test_updated_assets():
         root.geometry("700x500")
         
         gui = EnhancedGameGUI(root)
+        
+        print("  🔄 Setting up graphics system...")
         gui.setup_graphics()
+        
+        # Debug: Show what was actually loaded
+        print("  🔍 Debug - Loaded sprites:")
+        for sprite_name in gui.character_sprites.keys():
+            print(f"    - {sprite_name}")
+        print("  🔍 Debug - Loaded backgrounds:")  
+        for bg_name in gui.background_images.keys():
+            print(f"    - {bg_name}")
         
         # Show detailed asset counts
         sprite_count = len(gui.character_sprites)
@@ -238,13 +268,14 @@ def interactive_asset_replacement():
             
         elif choice == "4":
             print(f"\n📁 Current assets:")
-            sprites_dir = Path("game_assets/sprites")
+            project_root = get_project_root()
+            sprites_dir = project_root / "game_assets" / "sprites"
             if sprites_dir.exists():
                 print("  Character sprites:")
                 for sprite in sprites_dir.glob("*_sprite.png"):
                     print(f"    - {sprite.name}")
             
-            bg_dir = Path("game_assets/backgrounds")  
+            bg_dir = project_root / "game_assets" / "backgrounds"
             if bg_dir.exists():
                 print("  Scene backgrounds:")
                 for bg in bg_dir.glob("*.png"):
