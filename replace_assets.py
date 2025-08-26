@@ -87,8 +87,8 @@ def test_updated_assets():
     if sprite_dir.exists():
         print("  Character Sprites:")
         sprite_files = ['warrior_sprite.png', 'rogue_sprite.png', 'mage_sprite.png', 
-                       'enemy_sprite.png', 'primitive_creature_sprite.png', 
-                       'divine_heart_sprite.png', 'cave_guardian_sprite.png']
+                       'primitive_creature_sprite.png', 'divine_heart_sprite.png', 
+                       'cave_guardian_sprite.png']
         for sprite_file in sprite_files:
             sprite_path = sprite_dir / sprite_file
             status = "✅ EXISTS" if sprite_path.exists() else "❌ MISSING"
@@ -189,13 +189,12 @@ def interactive_asset_replacement():
             print("- rogue")
             print("- mage")
             print("=== ENEMIES ===")
-            print("- enemy (generic)")
             print("- primitive_creature")
             print("- divine_heart")
             print("- cave_guardian")
             
             sprite_name = input("Enter sprite name: ").strip().lower()
-            valid_sprites = ["warrior", "rogue", "mage", "enemy", "primitive_creature", 
+            valid_sprites = ["warrior", "rogue", "mage", "primitive_creature", 
                            "divine_heart", "cave_guardian"]
             
             if sprite_name in valid_sprites:

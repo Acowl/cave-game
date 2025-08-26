@@ -131,8 +131,7 @@ class EnhancedGameGUI(BaseGUI):
             'warrior': 'warrior_sprite.png',
             'rogue': 'rogue_sprite.png', 
             'mage': 'mage_sprite.png',
-            # Enemy sprites
-            'enemy': 'enemy_sprite.png',
+            # Enemy sprites (specific types only)
             'primitive_creature': 'primitive_creature_sprite.png',
             'divine_heart': 'divine_heart_sprite.png',
             'cave_guardian': 'cave_guardian_sprite.png'
@@ -158,8 +157,7 @@ class EnhancedGameGUI(BaseGUI):
                 'warrior': {'color': '#8B4513', 'symbol': '🛡️'},
                 'rogue': {'color': '#2F4F2F', 'symbol': '🗡️'},
                 'mage': {'color': '#4B0082', 'symbol': '🔮'},
-                # Enemy sprites
-                'enemy': {'color': '#8B0000', 'symbol': '👹'},
+                # Enemy sprites (specific types only)
                 'primitive_creature': {'color': '#A0522D', 'symbol': '🦎'},
                 'divine_heart': {'color': '#4B0082', 'symbol': '💜'},
                 'cave_guardian': {'color': '#696969', 'symbol': '🗿'}
@@ -188,11 +186,17 @@ class EnhancedGameGUI(BaseGUI):
             self.create_default_backgrounds(bg_dir)
         
         background_files = {
+            # Current backgrounds
             'cave_entrance': 'cave_entrance.png',
             'skull_chamber': 'skull_chamber.png',
-            'primitive_village': 'village.png',
+            'primitive_village': 'primitive_village.png',
+            'menu': 'menu.png',
+            # Missing backgrounds (will get placeholders)
+            'alley': 'alley.png',
             'armory': 'armory.png',
-            'menu': 'menu_bg.png'
+            'chief_house': 'chief_house.png',
+            'healing_pool': 'healing_pool.png',
+            'village_changed': 'village_changed.png'
         }
         
         for bg_name, filename in background_files.items():
@@ -212,11 +216,17 @@ class EnhancedGameGUI(BaseGUI):
             from PIL import Image, ImageDraw
             
             bg_configs = {
+                # Current backgrounds
                 'cave_entrance': [(20, 10, 5), (60, 40, 20)],  # Brown gradient
                 'skull_chamber': [(40, 20, 20), (20, 10, 10)], # Dark red
                 'primitive_village': [(10, 40, 10), (30, 60, 30)], # Green
+                'menu': [(10, 10, 20), (30, 20, 40)], # Purple
+                # Missing backgrounds (placeholders)
+                'alley': [(15, 15, 15), (35, 35, 35)], # Dark grey gradient
                 'armory': [(30, 30, 40), (50, 50, 60)], # Blue-grey
-                'menu': [(10, 10, 20), (30, 20, 40)] # Purple
+                'chief_house': [(40, 25, 10), (60, 45, 30)], # Brown hut
+                'healing_pool': [(10, 30, 50), (30, 50, 70)], # Blue healing
+                'village_changed': [(25, 15, 35), (45, 35, 55)] # Purple mystical
             }
             
             for name, (color1, color2) in bg_configs.items():

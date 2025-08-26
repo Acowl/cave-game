@@ -11,7 +11,7 @@ Based on codebase analysis, here's the complete list of all sprites and graphics
 - `warrior_sprite.png` - Tank class (brown/gold)
 - `rogue_sprite.png` - Agility class (green) 
 - `mage_sprite.png` - Magic class (purple)
-- `enemy_sprite.png` - Generic enemy (red)
+- ~~`enemy_sprite.png` - Generic enemy (deprecated)~~
 
 ✅ **Scene Backgrounds (400x300)**:
 - `cave_entrance.png` - Rocky entrance scene
