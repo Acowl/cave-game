@@ -90,15 +90,20 @@ def test_enhanced_gui_creation():
     try:
         from enhanced_gui_system import EnhancedGameGUI
         
-        # Create a simple root window
+        # Test both ways - with and without root
+        print("  Testing without root parameter...")
+        gui1 = EnhancedGameGUI()
+        print("  ✅ EnhancedGameGUI() works")
+        if hasattr(gui1, 'root') and gui1.root:
+            gui1.root.destroy()
+        
+        print("  Testing with root parameter...")
         root = tk.Tk()
-        root.withdraw()  # Hide it initially
-        
-        # Try to create enhanced GUI
-        gui = EnhancedGameGUI(root)
-        print("✅ EnhancedGameGUI instance created")
-        
+        root.withdraw()
+        gui2 = EnhancedGameGUI(root)
+        print("  ✅ EnhancedGameGUI(root) works")
         root.destroy()
+        
         return True, None
         
     except Exception as e:

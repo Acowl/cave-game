@@ -26,15 +26,24 @@ except ImportError as e:
 class EnhancedGameGUI(BaseGUI):
     """Enhanced GUI with graphics, animations, and Steam features"""
     
-    def __init__(self):
+    def __init__(self, root=None):
         # Initialize graphics system first
         self.graphics_loaded = False
         self.character_sprites = {}
         self.background_images = {}
         self.sound_enabled = True
         
+        # Store root if provided, otherwise let base class create it
+        self._external_root = root
+        
         # Initialize base GUI
         super().__init__()
+        
+        # If external root was provided, use it instead of the one created by base class
+        if self._external_root:
+            if hasattr(self, 'root') and self.root != self._external_root:
+                self.root.destroy()  # Clean up the auto-created root
+            self.root = self._external_root
         
         # Load enhanced features
         self.setup_graphics()

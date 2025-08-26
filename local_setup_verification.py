@@ -134,7 +134,8 @@ def create_quick_test():
                          bg="#8B4513", fg="white").pack(pady=10)
                 
             except Exception as e:
-                tk.messagebox.showerror("Error", f"Enhanced GUI failed: {e}")
+                from tkinter import messagebox
+                messagebox.showerror("Error", f"Enhanced GUI failed: {e}")
         
         return simple_test
         
