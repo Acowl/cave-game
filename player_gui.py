@@ -250,14 +250,14 @@ class PlayerGameGUI:
         self.canvas.create_text(
             450, 150,
             text="🏴‍☠️ SHABUYA",
-            fill='#gold',
+            fill='#FFD700',  # Gold color in hex
             font=('Arial', 48, 'bold')
         )
         
         self.canvas.create_text(
             450, 200,
             text="Cave Adventure",
-            fill='#silver',
+            fill='#C0C0C0',  # Silver color in hex
             font=('Arial', 24)
         )
         
