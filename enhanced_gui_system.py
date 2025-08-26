@@ -137,6 +137,7 @@ class EnhancedGameGUI(BaseGUI):
             'cave_guardian': 'cave_guardian_sprite.png'
         }
         
+        sprites_loaded = 0
         for sprite_name, filename in sprite_files.items():
             sprite_path = sprite_dir / filename
             if sprite_path.exists():
@@ -144,8 +145,13 @@ class EnhancedGameGUI(BaseGUI):
                     img = Image.open(sprite_path)
                     img = img.resize((64, 64), Image.Resampling.LANCZOS)
                     self.character_sprites[sprite_name] = ImageTk.PhotoImage(img)
+                    sprites_loaded += 1
                 except Exception as e:
                     print(f"Could not load sprite {sprite_name}: {e}")
+            else:
+                print(f"⚠️  Sprite file not found: {sprite_path}")
+        
+        print(f"  ✅ Loaded {sprites_loaded} character sprites")
     
     def create_default_sprites(self, sprite_dir: Path):
         """Create simple default sprites if none exist"""
@@ -209,6 +215,7 @@ class EnhancedGameGUI(BaseGUI):
             self.create_missing_backgrounds(bg_dir, missing_backgrounds)
         
         # Load all backgrounds
+        backgrounds_loaded = 0
         for bg_name, filename in background_files.items():
             bg_path = bg_dir / filename
             if bg_path.exists():
@@ -217,10 +224,13 @@ class EnhancedGameGUI(BaseGUI):
                     # Resize to fit game panel
                     img = img.resize((400, 300), Image.Resampling.LANCZOS)
                     self.background_images[bg_name] = ImageTk.PhotoImage(img)
+                    backgrounds_loaded += 1
                 except Exception as e:
                     print(f"Could not load background {bg_name}: {e}")
             else:
-                print(f"Background file missing: {filename}")
+                print(f"⚠️  Background file missing: {filename}")
+        
+        print(f"  ✅ Loaded {backgrounds_loaded} backgrounds")
     
     def create_missing_backgrounds(self, bg_dir: Path, missing_list):
         """Create placeholder backgrounds for missing scenes"""
