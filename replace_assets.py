@@ -146,13 +146,22 @@ def interactive_asset_replacement():
         
         if choice == "1":
             print("\nAvailable character sprites:")
+            print("=== PLAYER CHARACTERS ===")
             print("- warrior")
             print("- rogue")
-            print("- mage") 
-            print("- enemy")
+            print("- mage")
+            print("=== ENEMIES ===")
+            print("- enemy (generic)")
+            print("- alley_creature")
+            print("- divine_heart")
+            print("- primitive_creature")
+            print("- cave_guardian")
             
             sprite_name = input("Enter sprite name: ").strip().lower()
-            if sprite_name in ["warrior", "rogue", "mage", "enemy"]:
+            valid_sprites = ["warrior", "rogue", "mage", "enemy", "alley_creature", 
+                           "divine_heart", "primitive_creature", "cave_guardian"]
+            
+            if sprite_name in valid_sprites:
                 image_path = input("Enter path to your AI-generated sprite image: ").strip()
                 if os.path.exists(image_path):
                     replace_character_sprite(sprite_name, image_path)
@@ -163,13 +172,23 @@ def interactive_asset_replacement():
                 
         elif choice == "2":
             print("\nAvailable scene backgrounds:")
+            print("=== CURRENT SCENES ===")
             print("- cave_entrance")
             print("- skull_chamber")
             print("- primitive_village")
             print("- menu")
+            print("=== MISSING SCENES (High Priority) ===")
+            print("- alley")
+            print("- armory") 
+            print("- chief_house")
+            print("- healing_pool")
+            print("- village_changed")
             
             scene_name = input("Enter scene name: ").strip().lower()
-            if scene_name in ["cave_entrance", "skull_chamber", "primitive_village", "menu"]:
+            valid_scenes = ["cave_entrance", "skull_chamber", "primitive_village", "menu",
+                          "alley", "armory", "chief_house", "healing_pool", "village_changed"]
+            
+            if scene_name in valid_scenes:
                 image_path = input("Enter path to your AI-generated background image: ").strip()
                 if os.path.exists(image_path):
                     replace_scene_background(scene_name, image_path)
