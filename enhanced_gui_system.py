@@ -183,7 +183,6 @@ class EnhancedGameGUI(BaseGUI):
         bg_dir = Path("game_assets/backgrounds")
         if not bg_dir.exists():
             bg_dir.mkdir(parents=True, exist_ok=True)
-            self.create_default_backgrounds(bg_dir)
         
         background_files = {
             # Current backgrounds
@@ -199,6 +198,17 @@ class EnhancedGameGUI(BaseGUI):
             'village_changed': 'village_changed.png'
         }
         
+        # Check for missing backgrounds and create them
+        missing_backgrounds = []
+        for bg_name, filename in background_files.items():
+            bg_path = bg_dir / filename
+            if not bg_path.exists():
+                missing_backgrounds.append(bg_name)
+        
+        if missing_backgrounds:
+            self.create_missing_backgrounds(bg_dir, missing_backgrounds)
+        
+        # Load all backgrounds
         for bg_name, filename in background_files.items():
             bg_path = bg_dir / filename
             if bg_path.exists():
@@ -209,11 +219,13 @@ class EnhancedGameGUI(BaseGUI):
                     self.background_images[bg_name] = ImageTk.PhotoImage(img)
                 except Exception as e:
                     print(f"Could not load background {bg_name}: {e}")
+            else:
+                print(f"Background file missing: {filename}")
     
-    def create_default_backgrounds(self, bg_dir: Path):
-        """Create simple gradient backgrounds"""
+    def create_missing_backgrounds(self, bg_dir: Path, missing_list):
+        """Create placeholder backgrounds for missing scenes"""
         try:
-            from PIL import Image, ImageDraw
+            from PIL import Image, ImageDraw, ImageFont
             
             bg_configs = {
                 # Current backgrounds
@@ -229,21 +241,53 @@ class EnhancedGameGUI(BaseGUI):
                 'village_changed': [(25, 15, 35), (45, 35, 55)] # Purple mystical
             }
             
-            for name, (color1, color2) in bg_configs.items():
-                img = Image.new('RGB', (400, 300))
-                draw = ImageDraw.Draw(img)
-                
-                # Simple vertical gradient
-                for y in range(300):
-                    ratio = y / 300
-                    r = int(color1[0] * (1-ratio) + color2[0] * ratio)
-                    g = int(color1[1] * (1-ratio) + color2[1] * ratio)
-                    b = int(color1[2] * (1-ratio) + color2[2] * ratio)
-                    draw.line([(0, y), (400, y)], fill=(r, g, b))
-                
-                img.save(bg_dir / f"{name}.png")
+            scene_labels = {
+                'alley': 'ALLEY SCENE',
+                'armory': 'ARMORY SCENE', 
+                'chief_house': 'CHIEF HOUSE',
+                'healing_pool': 'HEALING POOL',
+                'village_changed': 'VILLAGE CHANGED'
+            }
             
-            print("✅ Default backgrounds created")
+            for bg_name in missing_list:
+                if bg_name in bg_configs:
+                    color1, color2 = bg_configs[bg_name]
+                    img = Image.new('RGB', (400, 300))
+                    draw = ImageDraw.Draw(img)
+                    
+                    # Simple vertical gradient
+                    for y in range(300):
+                        ratio = y / 300
+                        r = int(color1[0] * (1-ratio) + color2[0] * ratio)
+                        g = int(color1[1] * (1-ratio) + color2[1] * ratio)
+                        b = int(color1[2] * (1-ratio) + color2[2] * ratio)
+                        draw.line([(0, y), (400, y)], fill=(r, g, b))
+                    
+                    # Add text label if it's a placeholder
+                    if bg_name in scene_labels:
+                        try:
+                            font = ImageFont.load_default()
+                            text = scene_labels[bg_name]
+                            bbox = draw.textbbox((0, 0), text, font=font)
+                            text_width = bbox[2] - bbox[0]
+                            text_height = bbox[3] - bbox[1]
+                            x = (400 - text_width) // 2
+                            y = (300 - text_height) // 2
+                            
+                            # Text with outline for visibility
+                            for dx in [-1, 0, 1]:
+                                for dy in [-1, 0, 1]:
+                                    if dx or dy:
+                                        draw.text((x+dx, y+dy), text, fill='black', font=font)
+                            draw.text((x, y), text, fill='white', font=font)
+                        except Exception:
+                            # Fallback text
+                            fallback_text = scene_labels.get(bg_name, bg_name.upper()) or "PLACEHOLDER"
+                            draw.text((150, 140), fallback_text, fill='white')
+                    
+                    filename = f"{bg_name}.png"
+                    img.save(bg_dir / filename)
+                    print(f"✅ Created background placeholder: {filename}")
             
         except ImportError:
             print("⚠️ PIL not available - backgrounds will be plain")
