@@ -38,11 +38,11 @@ def replace_character_sprite(sprite_name, new_image_path):
     print(f"\n🧙 Replacing {sprite_name} sprite...")
     
     # Define target path
-    target_path = Path(f"game_assets/sprites/{sprite_name}_sprite.png")
+    target_path = Path("../game_assets/sprites/{sprite_name}_sprite.png")
     
     # Create backup
     if target_path.exists():
-        backup_path = Path(f"game_assets/sprites/backup_{sprite_name}_sprite.png")
+        backup_path = Path("../game_assets/sprites/backup_{sprite_name}_sprite.png")
         shutil.copy2(target_path, backup_path)
         print(f"  💾 Backed up original to: {backup_path}")
     
@@ -59,11 +59,11 @@ def replace_scene_background(scene_name, new_image_path):
     print(f"\n🏔️  Replacing {scene_name} background...")
     
     # Define target path
-    target_path = Path(f"game_assets/backgrounds/{scene_name}.png")
+    target_path = Path("../game_assets/backgrounds/{scene_name}.png")
     
     # Create backup
     if target_path.exists():
-        backup_path = Path(f"game_assets/backgrounds/backup_{scene_name}.png")
+        backup_path = Path("../game_assets/backgrounds/backup_{scene_name}.png")
         shutil.copy2(target_path, backup_path)
         print(f"  💾 Backed up original to: {backup_path}")
     
@@ -83,7 +83,7 @@ def test_updated_assets():
     from pathlib import Path
     
     print("  📁 Checking asset files...")
-    sprite_dir = Path("game_assets/sprites")
+    sprite_dir = Path("../game_assets/sprites")
     if sprite_dir.exists():
         print("  Character Sprites:")
         sprite_files = ['warrior_sprite.png', 'rogue_sprite.png', 'mage_sprite.png', 
@@ -94,7 +94,7 @@ def test_updated_assets():
             status = "✅ EXISTS" if sprite_path.exists() else "❌ MISSING"
             print(f"    - {sprite_file}: {status}")
     
-    bg_dir = Path("game_assets/backgrounds")
+    bg_dir = Path("../game_assets/backgrounds")
     if bg_dir.exists():
         print("  Scene Backgrounds:")
         bg_files = ['cave_entrance.png', 'skull_chamber.png', 'primitive_village.png', 
