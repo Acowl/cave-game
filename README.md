@@ -220,8 +220,6 @@ This repository illustrates:
 - Developer‑centric UX (tooling, quick iteration loops).
 - Foresight via explicit roadmap & architectural direction.
 
-Intended audience: technical reviewers, hiring managers, collaborators evaluating engineering process maturity.
-
 ---
 ## 17. Next Engineering Milestones
 1. Central asset + state registry module (single source of truth).
