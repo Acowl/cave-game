@@ -13,10 +13,10 @@ from PIL import Image, ImageTk
 
 class EnhancedGameGUI:
     def __init__(self):
-        print("🚀 Initializing Enhanced Game GUI v2.0...")
+        print("Initializing Enhanced Game GUI v2.0...")
         
         self.root = tk.Tk()
-        self.root.title("🏴‍☠️ SHABUYA Cave Adventure - ENHANCED GUI v2.0")
+        self.root.title("SHABUYA Cave Adventure - ENHANCED GUI v2.0")
         self.root.geometry("1200x800")
         self.root.configure(bg='#0a0a0a')
         
@@ -73,7 +73,7 @@ class EnhancedGameGUI:
         canvas_frame = tk.Frame(main_container, bg='#1a1a1a', relief=tk.RAISED, bd=2)
         canvas_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
         
-        canvas_title = tk.Label(canvas_frame, text="🎮 GAME DISPLAY", 
+        canvas_title = tk.Label(canvas_frame, text="GAME DISPLAY", 
                                font=('Arial', 16, 'bold'), fg='#00ff88', bg='#1a1a1a')
         canvas_title.pack(pady=10)
         
@@ -85,12 +85,12 @@ class EnhancedGameGUI:
         control_frame.pack(side=tk.RIGHT, fill=tk.Y)
         control_frame.pack_propagate(False)
         
-        control_title = tk.Label(control_frame, text="🎛️ CONTROLS", 
+        control_title = tk.Label(control_frame, text="CONTROLS", 
                                 font=('Arial', 14, 'bold'), fg='#ffffff', bg='#2a2a2a')
         control_title.pack(pady=15)
         
         # Scene selection
-        scene_frame = tk.LabelFrame(control_frame, text="🏞️ Scene", 
+        scene_frame = tk.LabelFrame(control_frame, text="Scene", 
                                    fg='#88ccff', bg='#2a2a2a', font=('Arial', 11, 'bold'))
         scene_frame.pack(fill=tk.X, padx=15, pady=10)
         
@@ -102,7 +102,7 @@ class EnhancedGameGUI:
         scene_dropdown.bind('<<ComboboxSelected>>', self.change_scene)
         
         # Character selection
-        char_frame = tk.LabelFrame(control_frame, text="🧙 Character", 
+        char_frame = tk.LabelFrame(control_frame, text="Character", 
                                   fg='#ffcc88', bg='#2a2a2a', font=('Arial', 11, 'bold'))
         char_frame.pack(fill=tk.X, padx=15, pady=10)
         
@@ -114,7 +114,7 @@ class EnhancedGameGUI:
         char_dropdown.bind('<<ComboboxSelected>>', self.change_character)
         
         # Game state
-        state_frame = tk.LabelFrame(control_frame, text="⚔️ State", 
+        state_frame = tk.LabelFrame(control_frame, text="State", 
                                    fg='#ff8888', bg='#2a2a2a', font=('Arial', 11, 'bold'))
         state_frame.pack(fill=tk.X, padx=15, pady=10)
         
@@ -126,27 +126,27 @@ class EnhancedGameGUI:
         state_dropdown.bind('<<ComboboxSelected>>', self.change_state)
         
         # Test buttons
-        test_frame = tk.LabelFrame(control_frame, text="🧪 Quick Tests", 
+        test_frame = tk.LabelFrame(control_frame, text="Quick Tests", 
                                   fg='#88ff88', bg='#2a2a2a', font=('Arial', 11, 'bold'))
         test_frame.pack(fill=tk.X, padx=15, pady=10)
         
-        combat_btn = tk.Button(test_frame, text="⚔️ Combat Test", 
+        combat_btn = tk.Button(test_frame, text="Combat Test", 
                               command=self.test_combat,
                               bg='#cc4444', fg='white', font=('Arial', 10, 'bold'))
         combat_btn.pack(fill=tk.X, padx=8, pady=4)
         
-        treasure_btn = tk.Button(test_frame, text="💰 Treasure Test", 
+        treasure_btn = tk.Button(test_frame, text="Treasure Test", 
                                 command=self.test_treasure,
                                 bg='#ccaa44', fg='white', font=('Arial', 10, 'bold'))
         treasure_btn.pack(fill=tk.X, padx=8, pady=4)
         
-        boss_btn = tk.Button(test_frame, text="🐉 Boss Test", 
+        boss_btn = tk.Button(test_frame, text="Boss Test", 
                             command=self.test_boss,
                             bg='#aa44cc', fg='white', font=('Arial', 10, 'bold'))
         boss_btn.pack(fill=tk.X, padx=8, pady=4)
         
         # Info display
-        info_frame = tk.LabelFrame(control_frame, text="📊 Info", 
+        info_frame = tk.LabelFrame(control_frame, text="Info", 
                                   fg='#cccccc', bg='#2a2a2a', font=('Arial', 11, 'bold'))
         info_frame.pack(fill=tk.X, padx=15, pady=10)
         
@@ -156,7 +156,7 @@ class EnhancedGameGUI:
         
     def load_assets(self):
         """Load all sprites and backgrounds"""
-        print("📦 Loading assets...")
+        print("Loading assets...")
         
         # Load sprites
         if os.path.exists(self.sprites_dir):
@@ -167,9 +167,9 @@ class EnhancedGameGUI:
                         image = Image.open(filepath)
                         image = image.resize((150, 150), Image.Resampling.LANCZOS)
                         self.sprite_cache[filename] = ImageTk.PhotoImage(image)
-                        print(f"  ✅ Loaded sprite: {filename}")
+                        print(f"  Loaded sprite: {filename}")
                     except Exception as e:
-                        print(f"  ❌ Failed to load sprite {filename}: {e}")
+                        print(f"  Failed to load sprite {filename}: {e}")
         
         # Load backgrounds
         if os.path.exists(self.backgrounds_dir):
@@ -180,11 +180,11 @@ class EnhancedGameGUI:
                         image = Image.open(filepath)
                         image = image.resize((900, 650), Image.Resampling.LANCZOS)
                         self.background_cache[filename] = ImageTk.PhotoImage(image)
-                        print(f"  ✅ Loaded background: {filename}")
+                        print(f"  Loaded background: {filename}")
                     except Exception as e:
-                        print(f"  ❌ Failed to load background {filename}: {e}")
+                        print(f"  Failed to load background {filename}: {e}")
         
-        print(f"🎨 Assets loaded: {len(self.sprite_cache)} sprites, {len(self.background_cache)} backgrounds")
+        print(f"Assets loaded: {len(self.sprite_cache)} sprites, {len(self.background_cache)} backgrounds")
         
     def change_scene(self, event=None):
         self.current_scene = self.scene_var.get()
@@ -297,16 +297,16 @@ Expected Files:
         
     def run(self):
         """Start the GUI"""
-        print("🚀 Enhanced GUI ready!")
+        print("Enhanced GUI ready!")
         self.root.mainloop()
 
 if __name__ == "__main__":
-    print("🏴‍☠️ SHABUYA Cave Adventure - Enhanced GUI v2.0")
+    print("SHABUYA Cave Adventure - Enhanced GUI v2.0")
     print("=" * 50)
-    print("✅ All 7 character sprites integrated")
-    print("✅ All 15+ background scenes available")
-    print("✅ Scene-dependent display system")
-    print("✅ Combat and exploration modes")
+    print("All 7 character sprites integrated")
+    print("All 15+ background scenes available")
+    print("Scene-dependent display system")
+    print("Combat and exploration modes")
     print("=" * 50)
     
     gui = EnhancedGameGUI()
