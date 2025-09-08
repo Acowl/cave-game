@@ -398,19 +398,20 @@ class PlayerGameGUI:
         
         self.canvas = tk.Canvas(canvas_frame, width=900, height=500, bg='black')
         self.canvas.pack(padx=10, pady=(0, 10))
+        self.canvas.pack_propagate(False)  # Prevent canvas from shrinking
         
         # Story text footer
         story_frame = tk.LabelFrame(canvas_frame, text="Story & Choices", 
                                    fg='#cccccc', bg='#1a1a1a', font=('Arial', 11, 'bold'))
-        story_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
+        story_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
         
-        self.story_text = tk.Text(story_frame, height=8, bg='#0a0a0a', fg='#cccccc',
+        self.story_text = tk.Text(story_frame, height=6, bg='#0a0a0a', fg='#cccccc',
                                  font=('Arial', 10), wrap=tk.WORD, relief=tk.FLAT)
-        self.story_text.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
+        self.story_text.pack(fill=tk.X, padx=8, pady=8)
         
         # Choice input
         choice_frame = tk.Frame(canvas_frame, bg='#1a1a1a')
-        choice_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        choice_frame.pack(fill=tk.X, padx=10, pady=(0, 5))
         
         choice_label = tk.Label(choice_frame, text="Enter choice (1-3):", 
                                fg='#88ccff', bg='#1a1a1a', font=('Arial', 10))
@@ -598,17 +599,17 @@ class PlayerGameGUI:
         bg_file = f"{self.current_scene}.png"
         if bg_file in self.background_cache:
             bg_image = self.background_cache[bg_file]
-            self.canvas.create_image(450, 325, image=bg_image)
+            self.canvas.create_image(450, 250, image=bg_image)
         else:
-            self.canvas.create_rectangle(0, 0, 900, 650, fill='#1a1a2e')
-            self.canvas.create_text(450, 325, text=f"{self.current_scene.upper()}", 
+            self.canvas.create_rectangle(0, 0, 900, 500, fill='#1a1a2e')
+            self.canvas.create_text(450, 250, text=f"{self.current_scene.upper()}", 
                                    fill='#4a4a6a', font=('Arial', 32))
         
         # Draw player sprite
         player_sprite = f"{self.player_character}_sprite.png"
         if player_sprite in self.sprite_cache:
             sprite_image = self.sprite_cache[player_sprite]
-            x, y = 350, 520
+            x, y = 350, 420
             self.canvas.create_image(x, y, image=sprite_image)
         
         # Draw enemy if in combat
@@ -618,7 +619,7 @@ class PlayerGameGUI:
             for enemy_file in enemy_sprites:
                 if enemy_file in self.sprite_cache:
                     enemy_image = self.sprite_cache[enemy_file]
-                    self.canvas.create_image(650, 500, image=enemy_image)
+                    self.canvas.create_image(650, 420, image=enemy_image)
                     break
         
         # Update UI labels
