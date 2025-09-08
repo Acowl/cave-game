@@ -1,0 +1,5 @@
+[33m9f50f5c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m readme update
+[33m1f61d6c[m final clean save
+[33me154f44[m Implement MVP player GUI with linear gameplay experience - Added class selection system with Warrior, Rogue, Mage - Implemented streamlined UI with story text footer - Added scene navigation via numbered choices - Implemented cave entrance and skull chamber logic - Added inventory/stats system - Fixed text scrolling to top instead of bottom - Removed unused files and cleaned up project structure
+[33m65182e3[m debug/organize
+[33m09f78a0[m player gui save

@@ -1,6 +1,8 @@
 # Cave Game - Python Requirements
-# This project uses only Python standard library
 # Python 3.7+ recommended
+
+# Required dependencies:
+Pillow>=8.0.0
 
 # For development and testing (optional):
 # flake8>=3.8.0

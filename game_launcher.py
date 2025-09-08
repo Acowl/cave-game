@@ -91,7 +91,10 @@ class GameLauncher:
         """Launch the player-focused game"""
         try:
             self.root.withdraw()  # Hide launcher window
-            subprocess.run([sys.executable, "player_gui.py"])
+            # Get the directory where this script is located
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            player_gui_path = os.path.join(script_dir, "player_gui.py")
+            subprocess.run([sys.executable, player_gui_path])
             self.root.deiconify()  # Show launcher window again
         except Exception as e:
             messagebox.showerror("Error", f"Failed to launch player mode: {e}")
@@ -101,7 +104,10 @@ class GameLauncher:
         """Launch the development mode"""
         try:
             self.root.withdraw()  # Hide launcher window
-            subprocess.run([sys.executable, "enhanced_gui_final.py"])
+            # Get the directory where this script is located
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            dev_gui_path = os.path.join(script_dir, "enhanced_gui_final.py")
+            subprocess.run([sys.executable, dev_gui_path])
             self.root.deiconify()  # Show launcher window again
         except Exception as e:
             messagebox.showerror("Error", f"Failed to launch dev mode: {e}")
