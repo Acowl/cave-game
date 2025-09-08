@@ -588,7 +588,7 @@ class PlayerGameGUI:
                 self.add_story_text_top(choice_text)
             
             self.add_story_text_top("")
-            self.add_story_text_top("Enter your choice (1-3) in the input field above.")
+            self.add_story_text_top("Enter your choice in the box to the right.")
         
     def update_display(self):
         """Update the main display"""
@@ -898,7 +898,7 @@ class PlayerGameGUI:
                 self.add_story_text_top(choice_text)
             
             self.add_story_text_top("")
-            self.add_story_text_top("Enter your choice (1-3) in the input field above.")
+            self.add_story_text_top("Enter your choice in the box to the right.")
         
     def gain_experience(self, amount):
         """Gain experience points"""
@@ -1045,7 +1045,7 @@ class PlayerGameGUI:
                 self.add_story_text(choice_text)
             
             self.add_story_text("")
-            self.add_story_text("Enter your choice (1-3) in the input field above.")
+            self.add_story_text("Enter your choice in the box to the right.")
         
     def save_game(self):
         """Save the current game state"""
