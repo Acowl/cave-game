@@ -186,19 +186,19 @@ class PlayerGameGUI:
             ],
             "primitive_village": [
                 {
-                    "text": "Approach the villagers openly",
-                    "description": "You walk into the village with open hands, showing peaceful intent.",
-                    "consequence": "gained_villagers_trust"
+                    "text": "Follow the creature into the alley",
+                    "description": "You decide to investigate the mysterious ground dwelling creature that scurried into the alley.",
+                    "consequence": "followed_creature_to_alley"
                 },
                 {
-                    "text": "Observe from the shadows",
-                    "description": "You watch the village from a hidden position to understand their ways.",
-                    "consequence": "learned_village_customs"
+                    "text": "Approach the armory",
+                    "description": "You head towards the armory building to see what weapons and equipment are available.",
+                    "consequence": "approached_armory"
                 },
                 {
-                    "text": "Seek out the chief",
+                    "text": "Approach the chief's house",
                     "description": "You decide to find and speak with the village chief.",
-                    "consequence": "advanced_to_chiefs_house"
+                    "consequence": "approached_chiefs_house"
                 }
             ],
             "chiefs_house": [
@@ -254,19 +254,19 @@ class PlayerGameGUI:
             ],
             "alley": [
                 {
-                    "text": "Explore the dark alley",
-                    "description": "You carefully navigate through the shadowy passage.",
-                    "consequence": "explored_alley"
+                    "text": "Confront the creature",
+                    "description": "You decide to face the ground dwelling creature head-on.",
+                    "consequence": "confronted_alley_creature"
                 },
                 {
-                    "text": "Search for valuables",
-                    "description": "You look for anything of value in the alley.",
-                    "consequence": "found_alley_treasure"
+                    "text": "Sneak past the creature",
+                    "description": "You try to quietly move past the creature without being noticed.",
+                    "consequence": "sneaked_past_creature"
                 },
                 {
-                    "text": "Investigate strange sounds",
-                    "description": "You follow mysterious noises coming from deeper in the alley.",
-                    "consequence": "investigated_alley_sounds"
+                    "text": "Search for items in the alley",
+                    "description": "You look for anything of value while avoiding the creature.",
+                    "consequence": "searched_alley_items"
                 }
             ],
             "armory": [
@@ -276,9 +276,9 @@ class PlayerGameGUI:
                     "consequence": "examined_armory"
                 },
                 {
-                    "text": "Ask about custom equipment",
-                    "description": "You inquire about having special equipment made.",
-                    "consequence": "requested_custom_equipment"
+                    "text": "Search for keys",
+                    "description": "You look for any keys that might unlock other buildings in the village.",
+                    "consequence": "searched_armory_keys"
                 },
                 {
                     "text": "Learn about weapon maintenance",
@@ -869,6 +869,34 @@ class PlayerGameGUI:
             'escaped_cave_in': {
                 'text': 'You manage to escape the collapsing tunnel and find yourself in a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.',
                 'effect': lambda: self.advance_to_scene('primitive_village')
+            },
+            'followed_creature_to_alley': {
+                'text': 'You cautiously follow the creature into the dark alley. The narrow passage is filled with shadows and strange sounds. You can hear the creature moving ahead of you, its footsteps echoing off the stone walls.',
+                'effect': lambda: self.advance_to_scene('alley')
+            },
+            'approached_armory': {
+                'text': 'You approach the armory building. The door is locked with a heavy iron lock. You need a key to enter this building.',
+                'effect': lambda: self.check_armory_access()
+            },
+            'approached_chiefs_house': {
+                'text': 'You approach the chief\'s house. The door is locked with an ornate tribal lock. You need a special key to enter this building.',
+                'effect': lambda: self.check_chiefs_house_access()
+            },
+            'confronted_alley_creature': {
+                'text': 'You confront the ground dwelling creature! It\'s a small but aggressive beast with sharp claws. Combat begins!',
+                'effect': lambda: self.start_alley_combat()
+            },
+            'sneaked_past_creature': {
+                'text': 'You successfully sneak past the creature without being noticed. You find a hidden alcove with some useful items.',
+                'effect': lambda: self.sneak_past_creature()
+            },
+            'searched_alley_items': {
+                'text': 'You carefully search the alley while staying hidden. You find some scattered coins and a rusty dagger.',
+                'effect': lambda: self.search_alley_items()
+            },
+            'searched_armory_keys': {
+                'text': 'You search through the armory and find a special key hidden in a locked drawer. It appears to be for the chief\'s house.',
+                'effect': lambda: self.find_chiefs_house_key()
             }
         }
         
@@ -933,6 +961,78 @@ class PlayerGameGUI:
         if scene_name not in self.visited_scenes:
             self.visited_scenes.append(scene_name)
         self.game_state = "exploring"
+        self.update_display()
+        self.show_scene_description()
+    
+    def check_armory_access(self):
+        """Check if player has armory key"""
+        if 'Armory Key' in self.inventory:
+            self.add_story_text("You use the armory key to unlock the door. The heavy iron lock clicks open.")
+            self.advance_to_scene('armory')
+        else:
+            self.add_story_text("The door is locked. You need to find the armory key first. Perhaps it can be found by defeating the creature in the alley?")
+            # Stay in primitive village
+            self.current_scene = "primitive_village"
+            self.update_display()
+            self.show_scene_description()
+    
+    def check_chiefs_house_access(self):
+        """Check if player has chiefs house key"""
+        if 'Chief\'s House Key' in self.inventory:
+            self.add_story_text("You use the chief's house key to unlock the ornate tribal lock. The door swings open.")
+            self.advance_to_scene('chiefs_house')
+        else:
+            self.add_story_text("The door is locked. You need to find the chief's house key first. Perhaps it can be found in the armory?")
+            # Stay in primitive village
+            self.current_scene = "primitive_village"
+            self.update_display()
+            self.show_scene_description()
+    
+    def start_alley_combat(self):
+        """Start combat with the alley creature"""
+        self.game_state = "in_combat"
+        self.add_story_text("The creature attacks! You must defend yourself!")
+        self.update_display()
+        
+        # Combat resolution
+        if random.random() < 0.8:  # 80% chance to win
+            self.add_story_text("You defeat the ground dwelling creature! It drops an armory key as it falls.")
+            self.inventory.append('Armory Key')
+            self.add_story_text("You pick up the armory key. This might be useful for accessing the armory building.")
+            self.gain_experience(15)
+        else:
+            damage_taken = max(8, random.randint(10, 18))
+            self.player_health = max(0, self.player_health - damage_taken)
+            self.add_story_text(f"The creature wounds you! You take {damage_taken} damage and retreat.")
+            
+        self.game_state = "exploring"
+        self.update_display()
+        self.show_scene_description()
+    
+    def sneak_past_creature(self):
+        """Successfully sneak past the creature"""
+        self.add_story_text("You find a hidden alcove with some useful items: a health potion and some gold coins.")
+        self.inventory.append('Health Potion')
+        self.gain_experience(10)
+        self.add_story_text("You gain 10 experience points for your stealthy approach.")
+        self.update_display()
+        self.show_scene_description()
+    
+    def search_alley_items(self):
+        """Search for items in the alley"""
+        self.add_story_text("You find some scattered coins and a rusty dagger. The dagger isn't very useful, but the coins might come in handy.")
+        self.inventory.append('Rusty Dagger')
+        self.gain_experience(5)
+        self.add_story_text("You gain 5 experience points for your thorough search.")
+        self.update_display()
+        self.show_scene_description()
+    
+    def find_chiefs_house_key(self):
+        """Find the chief's house key in the armory"""
+        self.add_story_text("You pick up the chief's house key. This ornate key should unlock the chief's house!")
+        self.inventory.append('Chief\'s House Key')
+        self.gain_experience(10)
+        self.add_story_text("You gain 10 experience points for finding the key.")
         self.update_display()
         self.show_scene_description()
         
