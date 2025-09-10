@@ -38,6 +38,12 @@ class PlayerGameGUI:
         self.equipped_armor = None
         self.equipped_accessories = []
         self.visited_scenes = []
+        
+        # Combat state
+        self.combat_enemy = None
+        self.combat_enemy_health = 0
+        self.combat_turn = 0
+        self.available_combat_skills = []
         self.game_progress = {
             'visited_village': False,
             'defeated_guardian': False,
@@ -95,7 +101,12 @@ class PlayerGameGUI:
                 'intelligence': 5,
                 'starting_weapon': 'Iron Sword',
                 'ability': 'Shield Block',
-                'description': 'A mighty warrior with high health and strength. Perfect for beginners.'
+                'description': 'A mighty warrior with high health and strength. Perfect for beginners.',
+                'combat_skills': {
+                    'basic_attack': {'name': 'Heavy Strike', 'damage_multiplier': 1.2, 'description': 'A powerful melee attack'},
+                    'defend': {'name': 'Shield Block', 'damage_reduction': 0.6, 'description': 'Raise shield to reduce incoming damage'},
+                    'run': {'name': 'Tactical Retreat', 'success_chance': 0.7, 'description': 'Retreat while maintaining defensive stance'}
+                }
             },
             'rogue': {
                 'name': 'Rogue',
@@ -105,7 +116,12 @@ class PlayerGameGUI:
                 'intelligence': 8,
                 'starting_weapon': 'Daggers',
                 'ability': 'Stealth',
-                'description': 'A swift rogue with high agility and critical hit chance.'
+                'description': 'A swift rogue with high agility and critical hit chance.',
+                'combat_skills': {
+                    'basic_attack': {'name': 'Quick Strike', 'damage_multiplier': 1.0, 'critical_chance': 0.3, 'description': 'A fast attack with high critical hit chance'},
+                    'defend': {'name': 'Dodge', 'damage_reduction': 0.4, 'description': 'Dodge to avoid most incoming damage'},
+                    'run': {'name': 'Flee', 'success_chance': 0.9, 'description': 'Quickly escape from combat'}
+                }
             },
             'mage': {
                 'name': 'Mage',
@@ -115,7 +131,12 @@ class PlayerGameGUI:
                 'intelligence': 18,
                 'starting_weapon': 'Magic Staff',
                 'ability': 'Fireball',
-                'description': 'A powerful mage with high intelligence and magical abilities.'
+                'description': 'A powerful mage with high intelligence and magical abilities.',
+                'combat_skills': {
+                    'basic_attack': {'name': 'Magic Bolt', 'damage_multiplier': 1.1, 'description': 'A magical projectile attack'},
+                    'defend': {'name': 'Magic Barrier', 'damage_reduction': 0.5, 'description': 'Create a magical barrier to reduce damage'},
+                    'run': {'name': 'Teleport', 'success_chance': 0.8, 'description': 'Magically teleport away from combat'}
+                }
             }
         }
         
@@ -993,20 +1014,154 @@ class PlayerGameGUI:
     def start_alley_combat(self):
         """Start combat with the alley creature"""
         self.game_state = "in_combat"
-        self.add_story_text("The creature attacks! You must defend yourself!")
-        self.update_display()
+        self.combat_enemy = "Ground Dwelling Creature"
+        self.combat_enemy_health = 30
+        self.combat_turn = 0
         
-        # Combat resolution
-        if random.random() < 0.8:  # 80% chance to win
-            self.add_story_text("You defeat the ground dwelling creature! It drops an armory key as it falls.")
-            self.inventory.append('Armory Key')
-            self.add_story_text("You pick up the armory key. This might be useful for accessing the armory building.")
-            self.gain_experience(15)
-        else:
-            damage_taken = max(8, random.randint(10, 18))
-            self.player_health = max(0, self.player_health - damage_taken)
-            self.add_story_text(f"The creature wounds you! You take {damage_taken} damage and retreat.")
+        # Initialize available combat skills based on class
+        self.available_combat_skills = list(self.classes[self.player_character]['combat_skills'].keys())
+        
+        self.add_story_text("The ground dwelling creature attacks! Combat begins!")
+        self.add_story_text(f"Enemy: {self.combat_enemy} (Health: {self.combat_enemy_health})")
+        self.add_story_text("Choose your combat action:")
+        
+        # Show combat choices
+        self.show_combat_choices()
+        
+        self.update_display()
+    
+    def show_combat_choices(self):
+        """Show combat choices based on available skills"""
+        self.add_story_text("")
+        self.add_story_text("Combat Options:")
+        
+        for i, skill_key in enumerate(self.available_combat_skills, 1):
+            skill = self.classes[self.player_character]['combat_skills'][skill_key]
+            self.add_story_text(f"{i}. {skill['name']} - {skill['description']}")
+        
+        self.add_story_text("")
+        self.add_story_text("Enter your choice (1-3) in the input field above.")
+    
+    def handle_combat_action(self, choice):
+        """Handle combat action based on player choice"""
+        if self.game_state != "in_combat":
+            return
             
+        if choice < 1 or choice > len(self.available_combat_skills):
+            self.add_story_text("Invalid choice! Please select 1-3.")
+            return
+            
+        skill_key = self.available_combat_skills[choice - 1]
+        skill = self.classes[self.player_character]['combat_skills'][skill_key]
+        
+        self.add_story_text(f"You use {skill['name']}!")
+        
+        if skill_key == 'basic_attack':
+            self.perform_attack(skill)
+        elif skill_key == 'defend':
+            self.perform_defend(skill)
+        elif skill_key == 'run':
+            self.perform_run(skill)
+        
+        # Check if combat continues
+        if self.game_state == "in_combat" and self.combat_enemy_health > 0:
+            self.enemy_turn()
+    
+    def perform_attack(self, skill):
+        """Perform attack action"""
+        # Calculate damage
+        weapon_damage = self.weapons[self.player_weapon]['damage']
+        base_damage = weapon_damage * skill['damage_multiplier']
+        
+        # Add class bonuses
+        if self.player_character == 'warrior':
+            base_damage += self.player_strength * 0.5
+        elif self.player_character == 'rogue':
+            base_damage += self.player_agility * 0.3
+        elif self.player_character == 'mage':
+            base_damage += self.player_intelligence * 0.4
+        
+        # Check for critical hit (rogue only)
+        if 'critical_chance' in skill and random.random() < skill['critical_chance']:
+            base_damage *= 2
+            self.add_story_text("Critical hit!")
+        
+        damage = int(base_damage)
+        self.combat_enemy_health -= damage
+        
+        self.add_story_text(f"You deal {damage} damage to the {self.combat_enemy}!")
+        
+        if self.combat_enemy_health <= 0:
+            self.end_combat_victory()
+    
+    def perform_defend(self, skill):
+        """Perform defend action"""
+        self.add_story_text(f"You prepare to {skill['name'].lower()}!")
+        # Defense will be applied during enemy turn
+        self.defending = True
+        self.defense_reduction = skill['damage_reduction']
+    
+    def perform_run(self, skill):
+        """Perform run action"""
+        if random.random() < skill['success_chance']:
+            self.add_story_text(f"You successfully {skill['name'].lower()}!")
+            self.end_combat_escape()
+        else:
+            self.add_story_text(f"Your attempt to {skill['name'].lower()} fails!")
+    
+    def enemy_turn(self):
+        """Handle enemy turn"""
+        if self.combat_enemy_health <= 0:
+            return
+            
+        self.add_story_text(f"The {self.combat_enemy} attacks!")
+        
+        # Calculate enemy damage
+        enemy_damage = random.randint(8, 15)
+        
+        # Apply defense if player defended
+        if hasattr(self, 'defending') and self.defending:
+            enemy_damage = int(enemy_damage * (1 - self.defense_reduction))
+            self.add_story_text(f"Your defense reduces the damage!")
+            self.defending = False
+        
+        self.player_health = max(0, self.player_health - enemy_damage)
+        self.add_story_text(f"You take {enemy_damage} damage! Health: {self.player_health}")
+        
+        if self.player_health <= 0:
+            self.end_combat_defeat()
+        else:
+            self.add_story_text("Choose your next combat action:")
+            self.show_combat_choices()
+    
+    def end_combat_victory(self):
+        """End combat with victory"""
+        self.add_story_text(f"You defeat the {self.combat_enemy}!")
+        self.add_story_text("The creature drops an armory key as it falls.")
+        self.inventory.append('Armory Key')
+        self.add_story_text("You pick up the armory key. This might be useful for accessing the armory building.")
+        self.gain_experience(15)
+        
+        self.game_state = "exploring"
+        self.update_display()
+        self.show_scene_description()
+    
+    def end_combat_escape(self):
+        """End combat with escape"""
+        self.add_story_text("You escape from combat!")
+        self.gain_experience(5)
+        
+        self.game_state = "exploring"
+        self.update_display()
+        self.show_scene_description()
+    
+    def end_combat_defeat(self):
+        """End combat with defeat"""
+        self.add_story_text("You are defeated! You retreat from combat.")
+        self.add_story_text("You lose some health and return to the village.")
+        
+        # Return to village with reduced health
+        self.current_scene = "primitive_village"
         self.game_state = "exploring"
         self.update_display()
         self.show_scene_description()
@@ -1204,15 +1359,21 @@ class PlayerGameGUI:
         """Handle user input for choice selection"""
         try:
             choice_number = int(self.choice_entry.get())
-            if 1 <= choice_number <= 3:
-                # Find the choice based on the number
-                choices = self.scene_choices[self.current_scene]
-                if choice_number - 1 < len(choices):
-                    self.execute_choice(choices[choice_number - 1], None) # No window to destroy here
-                else:
-                    self.add_story_text("Invalid choice number.")
+            
+            # Check if player is in combat
+            if self.game_state == "in_combat":
+                self.handle_combat_action(choice_number)
             else:
-                self.add_story_text("Please enter a number between 1 and 3.")
+                # Normal scene choice handling
+                if 1 <= choice_number <= 3:
+                    # Find the choice based on the number
+                    choices = self.scene_choices[self.current_scene]
+                    if choice_number - 1 < len(choices):
+                        self.execute_choice(choices[choice_number - 1], None) # No window to destroy here
+                    else:
+                        self.add_story_text("Invalid choice number.")
+                else:
+                    self.add_story_text("Please enter a number between 1 and 3.")
         except ValueError:
             self.add_story_text("Please enter a valid number.")
         self.choice_entry.delete(0, tk.END) # Clear the entry field
