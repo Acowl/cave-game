@@ -203,19 +203,14 @@ class PlayerGameGUI:
             ],
             "chiefs_house": [
                 {
-                    "text": "Show respect and ask for guidance",
-                    "description": "You approach the chief with proper respect and seek wisdom.",
-                    "consequence": "met_chief"
+                    "text": "Use the chief's house key",
+                    "description": "You attempt to use the chief's house key to enter the building.",
+                    "consequence": "used_chiefs_house_key"
                 },
                 {
-                    "text": "Offer your services",
-                    "description": "You propose to help the village with your unique abilities.",
-                    "consequence": "offered_services"
-                },
-                {
-                    "text": "Ask about the healing pool",
-                    "description": "You inquire about the mystical healing pool the chief mentioned.",
-                    "consequence": "advanced_to_healing_pool"
+                    "text": "Return to the primitive village",
+                    "description": "You decide to leave the chief's house and return to the village.",
+                    "consequence": "returned_to_village"
                 }
             ],
             "healing_pool": [
@@ -271,19 +266,14 @@ class PlayerGameGUI:
             ],
             "armory": [
                 {
-                    "text": "Examine the weapons",
-                    "description": "You study the various weapons and armor on display.",
-                    "consequence": "examined_armory"
+                    "text": "Use the armory key",
+                    "description": "You attempt to use the armory key to access the armory's contents.",
+                    "consequence": "used_armory_key"
                 },
                 {
-                    "text": "Search for keys",
-                    "description": "You look for any keys that might unlock other buildings in the village.",
-                    "consequence": "searched_armory_keys"
-                },
-                {
-                    "text": "Learn about weapon maintenance",
-                    "description": "You ask about proper care and maintenance of weapons.",
-                    "consequence": "learned_weapon_maintenance"
+                    "text": "Return to the primitive village",
+                    "description": "You decide to leave the armory and return to the village.",
+                    "consequence": "returned_to_village"
                 }
             ],
             "cave_in": [
@@ -897,6 +887,18 @@ class PlayerGameGUI:
             'searched_armory_keys': {
                 'text': 'You search through the armory and find a special key hidden in a locked drawer. It appears to be for the chief\'s house.',
                 'effect': lambda: self.find_chiefs_house_key()
+            },
+            'used_armory_key': {
+                'text': 'You use the armory key to unlock the armory\'s storage. Inside you find weapons, armor, and a special key for the chief\'s house.',
+                'effect': lambda: self.access_armory_contents()
+            },
+            'used_chiefs_house_key': {
+                'text': 'You use the chief\'s house key to unlock the ornate door. The chief welcomes you inside and offers guidance.',
+                'effect': lambda: self.access_chiefs_house()
+            },
+            'returned_to_village': {
+                'text': 'You return to the primitive village. The villagers continue their daily activities around you.',
+                'effect': lambda: self.advance_to_scene('primitive_village')
             }
         }
         
@@ -965,24 +967,24 @@ class PlayerGameGUI:
         self.show_scene_description()
     
     def check_armory_access(self):
-        """Check if player has armory key"""
+        """Check if player has armory key and advance to armory scene"""
         if 'Armory Key' in self.inventory:
-            self.add_story_text("You use the armory key to unlock the door. The heavy iron lock clicks open.")
+            self.add_story_text("You approach the armory building. The door is locked, but you have the armory key.")
             self.advance_to_scene('armory')
         else:
-            self.add_story_text("The door is locked. You need to find the armory key first. Perhaps it can be found by defeating the creature in the alley?")
+            self.add_story_text("You approach the armory building. The door is locked with a heavy iron lock. You need to find the armory key first. Perhaps it can be found by defeating the creature in the alley?")
             # Stay in primitive village
             self.current_scene = "primitive_village"
             self.update_display()
             self.show_scene_description()
     
     def check_chiefs_house_access(self):
-        """Check if player has chiefs house key"""
+        """Check if player has chiefs house key and advance to chiefs house scene"""
         if 'Chief\'s House Key' in self.inventory:
-            self.add_story_text("You use the chief's house key to unlock the ornate tribal lock. The door swings open.")
+            self.add_story_text("You approach the chief's house. The door is locked, but you have the chief's house key.")
             self.advance_to_scene('chiefs_house')
         else:
-            self.add_story_text("The door is locked. You need to find the chief's house key first. Perhaps it can be found in the armory?")
+            self.add_story_text("You approach the chief's house. The door is locked with an ornate tribal lock. You need to find the chief's house key first. Perhaps it can be found in the armory?")
             # Stay in primitive village
             self.current_scene = "primitive_village"
             self.update_display()
@@ -1033,6 +1035,44 @@ class PlayerGameGUI:
         self.inventory.append('Chief\'s House Key')
         self.gain_experience(10)
         self.add_story_text("You gain 10 experience points for finding the key.")
+        self.update_display()
+        self.show_scene_description()
+    
+    def access_armory_contents(self):
+        """Access armory contents when using the key"""
+        if 'Armory Key' in self.inventory:
+            self.add_story_text("You successfully unlock the armory storage! Inside you find:")
+            self.add_story_text("- A sturdy iron sword")
+            self.add_story_text("- Chain mail armor")
+            self.add_story_text("- A special key for the chief's house")
+            self.add_story_text("- Some gold coins")
+            
+            # Add items to inventory
+            self.inventory.extend(['Iron Sword', 'Chain Mail', 'Chief\'s House Key', 'Gold Coins'])
+            self.gain_experience(20)
+            self.add_story_text("You gain 20 experience points for successfully accessing the armory!")
+        else:
+            self.add_story_text("You don't have the armory key. You need to find it first.")
+            
+        self.update_display()
+        self.show_scene_description()
+    
+    def access_chiefs_house(self):
+        """Access chief's house when using the key"""
+        if 'Chief\'s House Key' in self.inventory:
+            self.add_story_text("You successfully enter the chief's house! The chief welcomes you and offers:")
+            self.add_story_text("- Guidance about the village's history")
+            self.add_story_text("- Information about the healing pool")
+            self.add_story_text("- A blessing that restores your health")
+            self.add_story_text("- Knowledge about the village's current troubles")
+            
+            # Restore health and gain experience
+            self.restore_health(50)
+            self.gain_experience(25)
+            self.add_story_text("The chief's blessing restores your health and you gain 25 experience points!")
+        else:
+            self.add_story_text("You don't have the chief's house key. You need to find it first.")
+            
         self.update_display()
         self.show_scene_description()
         
