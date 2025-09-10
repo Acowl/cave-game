@@ -850,7 +850,7 @@ class PlayerGameGUI:
                 'effect': lambda: self.gain_experience(15)
             },
             'advanced_to_village': {
-                'text': 'You venture deeper into the cave system and emerge into a primitive village.',
+                'text': 'You venture deeper into the cave system and emerge into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.',
                 'effect': lambda: self.advance_to_scene('primitive_village')
             },
             'advanced_to_chiefs_house': {
