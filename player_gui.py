@@ -567,6 +567,7 @@ class PlayerGameGUI:
         scene_descriptions = {
             "cave_entrance": "You wake up in a dark cave entrance, disoriented and confused. The air is cool and damp, and you can barely see your own hands in front of your face. You have no memory of how you got here.",
             "skull_chamber": "You enter a chamber filled with ancient skulls. The atmosphere is heavy with dark energy. The skulls seem to watch you as you move through the chamber.",
+            "cave_in": "The ground shakes violently as the tunnel begins to collapse around you! Rocks and debris fall from the ceiling, and dust fills the air. You must act quickly to escape before you're buried alive.",
             "primitive_village": "You emerge from the cave into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.",
             "chiefs_house": "You approach the chief's house. It's the largest building in the village, decorated with tribal symbols and trophies. The chief appears to be expecting visitors.",
             "healing_pool": "You find a mystical healing pool. Its waters glow with magical energy. The air around it feels charged with ancient power.",
@@ -1024,6 +1025,7 @@ class PlayerGameGUI:
         scene_descriptions = {
             "cave_entrance": "You wake up in a dark cave entrance, disoriented and confused. The air is cool and damp, and you can barely see your own hands in front of your face. You have no memory of how you got here.",
             "skull_chamber": "You enter a chamber filled with ancient skulls. The atmosphere is heavy with dark energy. The skulls seem to watch you as you move through the chamber.",
+            "cave_in": "The ground shakes violently as the tunnel begins to collapse around you! Rocks and debris fall from the ceiling, and dust fills the air. You must act quickly to escape before you're buried alive.",
             "primitive_village": "You emerge from the cave into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.",
             "chiefs_house": "You approach the chief's house. It's the largest building in the village, decorated with tribal symbols and trophies. The chief appears to be expecting visitors.",
             "healing_pool": "You find a mystical healing pool. Its waters glow with magical energy. The air around it feels charged with ancient power.",
