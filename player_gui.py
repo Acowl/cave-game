@@ -44,6 +44,23 @@ class PlayerGameGUI:
         self.combat_enemy_health = 0
         self.combat_turn = 0
         self.available_combat_skills = []
+        
+        # Scene descriptions - centralized to prevent duplication
+        self.scene_descriptions = {
+            "cave_entrance": "You wake up in a dark cave entrance, disoriented and confused. The air is cool and damp, and you can barely see your own hands in front of your face. You have no memory of how you got here.",
+            "skull_chamber": "You enter a chamber filled with ancient skulls. The atmosphere is heavy with dark energy. The skulls seem to watch you as you move through the chamber.",
+            "cave_in": "The ground shakes violently as the tunnel begins to collapse around you! Rocks and debris fall from the ceiling, and dust fills the air. You must act quickly to escape before you're buried alive.",
+            "primitive_village": "You emerge from the cave into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.",
+            "chiefs_house": "You approach the chief's house. It's the largest building in the village, decorated with tribal symbols and trophies. The chief appears to be expecting visitors.",
+            "healing_pool": "You find a mystical healing pool. Its waters glow with magical energy. The air around it feels charged with ancient power.",
+            "village_changed": "The village has changed dramatically. Dark forces have taken hold. The once peaceful settlement now feels hostile and dangerous.",
+            "alley": "You find yourself in a dark, narrow alley. Shadows dance on the walls, and you can hear distant sounds echoing through the passage.",
+            "armory": "You enter a well-equipped armory. Weapons and armor line the walls, and the sound of metalworking echoes from the back."
+        }
+        
+        # Initialize consequences - will be populated in __init__
+        self.consequences = {}
+        self._initialize_consequences()
         self.game_progress = {
             'visited_village': False,
             'defeated_guardian': False,
@@ -529,6 +546,155 @@ class PlayerGameGUI:
                         print(f"Failed to load background {filename}: {e}")
         
         print(f"Assets loaded: {len(self.sprite_cache)} sprites, {len(self.background_cache)} backgrounds")
+    
+    def _initialize_consequences(self):
+        """Initialize all game consequences in a centralized location"""
+        self.consequences = {
+            'looked_around_dark': {
+                'text': 'It\'s dark, you can\'t see.',
+                'effect': lambda: None
+            },
+            'sat_and_cried': {
+                'text': 'You cried, nothing happened.',
+                'effect': lambda: None
+            },
+            'entered_skull_chamber': {
+                'text': 'You entered the skull chamber.',
+                'effect': lambda: self.advance_to_skull_chamber()
+            },
+            'no_exit_visible': {
+                'text': 'No exit is visible.',
+                'effect': lambda: None
+            },
+            'tunnel_collapse': {
+                'text': 'The tunnel starts to collapse!!',
+                'effect': lambda: self.trigger_cave_in()
+            },
+            'gained_villagers_trust': {
+                'text': 'The villagers welcome you warmly.',
+                'effect': lambda: self.gain_experience(10)
+            },
+            'learned_village_customs': {
+                'text': 'You learn about the village customs.',
+                'effect': lambda: self.gain_experience(5)
+            },
+            'met_chief': {
+                'text': 'The chief greets you with respect.',
+                'effect': lambda: self.gain_experience(15)
+            },
+            'offered_services': {
+                'text': 'You offer your services to the village.',
+                'effect': lambda: self.gain_experience(10)
+            },
+            'advanced_to_healing_pool': {
+                'text': 'You make your way to the healing pool.',
+                'effect': lambda: self.advance_to_scene('healing_pool')
+            },
+            'restored_health': {
+                'text': 'The healing waters restore your health.',
+                'effect': lambda: self.restore_health(50)
+            },
+            'gained_magical_insight': {
+                'text': 'You gain magical insight from the pool.',
+                'effect': lambda: self.gain_experience(20)
+            },
+            'understood_pool_magic': {
+                'text': 'You understand the pool\'s magical properties.',
+                'effect': lambda: self.gain_experience(15)
+            },
+            'learned_ancient_secrets': {
+                'text': 'You learn ancient secrets from the chief.',
+                'effect': lambda: self.gain_experience(25)
+            },
+            'entered_cautiously': {
+                'text': 'You enter the chamber cautiously.',
+                'effect': lambda: self.gain_experience(5)
+            },
+            'confronted_darkness': {
+                'text': 'You confront the darkness head-on.',
+                'effect': lambda: self.gain_experience(10)
+            },
+            'learned_village_history': {
+                'text': 'You learn about the village\'s history.',
+                'effect': lambda: self.gain_experience(10)
+            },
+            'found_artifacts': {
+                'text': 'You discover ancient artifacts.',
+                'effect': lambda: self.gain_experience(15)
+            },
+            'helped_villagers': {
+                'text': 'You help the villagers with their tasks.',
+                'effect': lambda: self.gain_experience(10)
+            },
+            'examined_armory': {
+                'text': 'You examine the weapons and armor in detail.',
+                'effect': lambda: self.gain_experience(10)
+            },
+            'requested_custom_equipment': {
+                'text': 'You request custom equipment from the armorer.',
+                'effect': lambda: self.gain_experience(5)
+            },
+            'learned_weapon_maintenance': {
+                'text': 'You learn valuable techniques for maintaining your weapons.',
+                'effect': lambda: self.gain_experience(15)
+            },
+            'advanced_to_village': {
+                'text': 'You venture deeper into the cave system and emerge into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.',
+                'effect': lambda: self.advance_to_scene('primitive_village')
+            },
+            'advanced_to_chiefs_house': {
+                'text': 'You make your way to the chief\'s house, the largest building in the village.',
+                'effect': lambda: self.advance_to_scene('chiefs_house')
+            },
+            'advanced_to_village_changed': {
+                'text': 'You return to the village, but something has changed dramatically.',
+                'effect': lambda: self.advance_to_scene('village_changed')
+            },
+            'escaped_cave_in': {
+                'text': 'You manage to escape the collapsing tunnel and find yourself in a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.',
+                'effect': lambda: self.advance_to_scene('primitive_village')
+            },
+            'followed_creature_to_alley': {
+                'text': 'You cautiously follow the creature into the dark alley. The narrow passage is filled with shadows and strange sounds. You can hear the creature moving ahead of you, its footsteps echoing off the stone walls.',
+                'effect': lambda: self.advance_to_scene('alley')
+            },
+            'approached_armory': {
+                'text': 'You approach the armory building. The door is locked with a heavy iron lock. You need a key to enter this building.',
+                'effect': lambda: self.check_armory_access()
+            },
+            'approached_chiefs_house': {
+                'text': 'You approach the chief\'s house. The door is locked with an ornate tribal lock. You need a special key to enter this building.',
+                'effect': lambda: self.check_chiefs_house_access()
+            },
+            'confronted_alley_creature': {
+                'text': 'You confront the ground dwelling creature! It\'s a small but aggressive beast with sharp claws. Combat begins!',
+                'effect': lambda: self.start_alley_combat()
+            },
+            'sneaked_past_creature': {
+                'text': 'You successfully sneak past the creature without being noticed. You find a hidden alcove with some useful items.',
+                'effect': lambda: self.sneak_past_creature()
+            },
+            'searched_alley_items': {
+                'text': 'You carefully search the alley while staying hidden. You find some scattered coins and a rusty dagger.',
+                'effect': lambda: self.search_alley_items()
+            },
+            'searched_armory_keys': {
+                'text': 'You search through the armory and find a special key hidden in a locked drawer. It appears to be for the chief\'s house.',
+                'effect': lambda: self.find_chiefs_house_key()
+            },
+            'used_armory_key': {
+                'text': 'You use the armory key to unlock the armory\'s storage. Inside you find weapons, armor, and a special key for the chief\'s house.',
+                'effect': lambda: self.access_armory_contents()
+            },
+            'used_chiefs_house_key': {
+                'text': 'You use the chief\'s house key to unlock the ornate door. The chief welcomes you inside and offers guidance.',
+                'effect': lambda: self.access_chiefs_house()
+            },
+            'returned_to_village': {
+                'text': 'You return to the primitive village. The villagers continue their daily activities around you.',
+                'effect': lambda: self.advance_to_scene('primitive_village')
+            }
+        }
         
     def start_new_game(self):
         """Start a new game"""
@@ -575,19 +741,10 @@ class PlayerGameGUI:
         
     def show_scene_description(self):
         """Show the current scene description and choices automatically"""
-        scene_descriptions = {
-            "cave_entrance": "You wake up in a dark cave entrance, disoriented and confused. The air is cool and damp, and you can barely see your own hands in front of your face. You have no memory of how you got here.",
-            "skull_chamber": "You enter a chamber filled with ancient skulls. The atmosphere is heavy with dark energy. The skulls seem to watch you as you move through the chamber.",
-            "cave_in": "The ground shakes violently as the tunnel begins to collapse around you! Rocks and debris fall from the ceiling, and dust fills the air. You must act quickly to escape before you're buried alive.",
-            "primitive_village": "You emerge from the cave into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.",
-            "chiefs_house": "You approach the chief's house. It's the largest building in the village, decorated with tribal symbols and trophies. The chief appears to be expecting visitors.",
-            "healing_pool": "You find a mystical healing pool. Its waters glow with magical energy. The air around it feels charged with ancient power.",
-            "village_changed": "The village has changed dramatically. Dark forces have taken hold. The once peaceful settlement now feels hostile and dangerous.",
-            "alley": "You find yourself in a dark, narrow alley. Shadows dance on the walls, and you can hear distant sounds echoing through the passage.",
-            "armory": "You enter a well-equipped armory. Weapons and armor line the walls, and the sound of metalworking echoes from the back."
-        }
+        # Clear previous text
+        self.clear_story_text()
         
-        scene_desc = scene_descriptions.get(self.current_scene, "You examine your surroundings carefully.")
+        scene_desc = self.scene_descriptions.get(self.current_scene, "You examine your surroundings carefully.")
         self.add_story_text_top(scene_desc)
         
         # If this scene has choices, show them as a numbered list
@@ -756,203 +913,36 @@ class PlayerGameGUI:
         
     def handle_consequence(self, consequence):
         """Handle the consequences of player choices"""
-        consequences = {
-            'looked_around_dark': {
-                'text': 'It\'s dark, you can\'t see.',
-                'effect': lambda: None
-            },
-            'sat_and_cried': {
-                'text': 'You cried, nothing happened.',
-                'effect': lambda: None
-            },
-            'entered_skull_chamber': {
-                'text': 'You entered the skull chamber.',
-                'effect': lambda: self.advance_to_skull_chamber()
-            },
-            'no_exit_visible': {
-                'text': 'No exit is visible.',
-                'effect': lambda: None
-            },
-            'tunnel_collapse': {
-                'text': 'The tunnel starts to collapse!!',
-                'effect': lambda: self.trigger_cave_in()
-            },
-            'learned_ancient_secrets': {
-                'text': 'Ancient knowledge flows into your mind, enhancing your abilities.',
-                'effect': lambda: self.gain_experience(25)
-            },
-            'found_artifacts': {
-                'text': 'You find valuable artifacts that could be useful.',
-                'effect': lambda: self.gain_experience(15)
-            },
-            'gained_spiritual_insight': {
-                'text': 'You feel spiritually enlightened and more powerful.',
-                'effect': lambda: self.gain_experience(20)
-            },
-            'gained_villagers_trust': {
-                'text': 'The villagers begin to trust you and offer their help.',
-                'effect': lambda: self.gain_experience(15)
-            },
-            'learned_village_customs': {
-                'text': 'You understand the village customs and can navigate their society.',
-                'effect': lambda: self.gain_experience(10)
-            },
-            'helped_villagers': {
-                'text': 'Your help earns you the gratitude of the villagers.',
-                'effect': lambda: self.gain_experience(15)
-            },
-            'met_chief': {
-                'text': 'The chief recognizes your worth and offers guidance.',
-                'effect': lambda: self.gain_experience(20)
-            },
-            'offered_services': {
-                'text': 'The village welcomes your offer of assistance.',
-                'effect': lambda: self.gain_experience(15)
-            },
-            'learned_village_history': {
-                'text': 'You learn about the village\'s rich history and traditions.',
-                'effect': lambda: self.gain_experience(15)
-            },
-            'restored_health': {
-                'text': 'The healing waters restore your health and vitality.',
-                'effect': lambda: self.restore_health(50)
-            },
-            'gained_magical_insight': {
-                'text': 'You gain deeper understanding of magical forces.',
-                'effect': lambda: self.gain_experience(25)
-            },
-            'understood_pool_magic': {
-                'text': 'You learn to harness the pool\'s magical properties.',
-                'effect': lambda: self.gain_experience(20)
-            },
-            'confronted_darkness': {
-                'text': 'You face the corruption with courage and determination.',
-                'effect': lambda: self.gain_experience(30)
-            },
-            'protected_villagers': {
-                'text': 'You successfully protect the innocent villagers.',
-                'effect': lambda: self.gain_experience(25)
-            },
-            'found_corruption_source': {
-                'text': 'You discover the source of the corruption.',
-                'effect': lambda: self.gain_experience(30)
-            },
-            'explored_alley': {
-                'text': 'You discover a hidden passage in the alley.',
-                'effect': lambda: self.gain_experience(15)
-            },
-            'found_alley_treasure': {
-                'text': 'You find valuable items hidden in the alley.',
-                'effect': lambda: self.gain_experience(20)
-            },
-            'investigated_alley_sounds': {
-                'text': 'You uncover the source of the mysterious sounds.',
-                'effect': lambda: self.gain_experience(15)
-            },
-            'examined_armory': {
-                'text': 'You learn about the quality of weapons available.',
-                'effect': lambda: self.gain_experience(15)
-            },
-            'requested_custom_equipment': {
-                'text': 'The smith agrees to craft custom equipment for you.',
-                'effect': lambda: self.gain_experience(20)
-            },
-            'learned_weapon_maintenance': {
-                'text': 'You learn valuable techniques for maintaining your weapons.',
-                'effect': lambda: self.gain_experience(15)
-            },
-            'advanced_to_village': {
-                'text': 'You venture deeper into the cave system and emerge into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.',
-                'effect': lambda: self.advance_to_scene('primitive_village')
-            },
-            'advanced_to_chiefs_house': {
-                'text': 'You make your way to the chief\'s house, the largest building in the village.',
-                'effect': lambda: self.advance_to_scene('chiefs_house')
-            },
-            'advanced_to_healing_pool': {
-                'text': 'Following the chief\'s directions, you find the mystical healing pool.',
-                'effect': lambda: self.advance_to_scene('healing_pool')
-            },
-            'advanced_to_village_changed': {
-                'text': 'You return to the village, but something has changed dramatically.',
-                'effect': lambda: self.advance_to_scene('village_changed')
-            },
-            'escaped_cave_in': {
-                'text': 'You manage to escape the collapsing tunnel and find yourself in a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.',
-                'effect': lambda: self.advance_to_scene('primitive_village')
-            },
-            'followed_creature_to_alley': {
-                'text': 'You cautiously follow the creature into the dark alley. The narrow passage is filled with shadows and strange sounds. You can hear the creature moving ahead of you, its footsteps echoing off the stone walls.',
-                'effect': lambda: self.advance_to_scene('alley')
-            },
-            'approached_armory': {
-                'text': 'You approach the armory building. The door is locked with a heavy iron lock. You need a key to enter this building.',
-                'effect': lambda: self.check_armory_access()
-            },
-            'approached_chiefs_house': {
-                'text': 'You approach the chief\'s house. The door is locked with an ornate tribal lock. You need a special key to enter this building.',
-                'effect': lambda: self.check_chiefs_house_access()
-            },
-            'confronted_alley_creature': {
-                'text': 'You confront the ground dwelling creature! It\'s a small but aggressive beast with sharp claws. Combat begins!',
-                'effect': lambda: self.start_alley_combat()
-            },
-            'sneaked_past_creature': {
-                'text': 'You successfully sneak past the creature without being noticed. You find a hidden alcove with some useful items.',
-                'effect': lambda: self.sneak_past_creature()
-            },
-            'searched_alley_items': {
-                'text': 'You carefully search the alley while staying hidden. You find some scattered coins and a rusty dagger.',
-                'effect': lambda: self.search_alley_items()
-            },
-            'searched_armory_keys': {
-                'text': 'You search through the armory and find a special key hidden in a locked drawer. It appears to be for the chief\'s house.',
-                'effect': lambda: self.find_chiefs_house_key()
-            },
-            'used_armory_key': {
-                'text': 'You use the armory key to unlock the armory\'s storage. Inside you find weapons, armor, and a special key for the chief\'s house.',
-                'effect': lambda: self.access_armory_contents()
-            },
-            'used_chiefs_house_key': {
-                'text': 'You use the chief\'s house key to unlock the ornate door. The chief welcomes you inside and offers guidance.',
-                'effect': lambda: self.access_chiefs_house()
-            },
-            'returned_to_village': {
-                'text': 'You return to the primitive village. The villagers continue their daily activities around you.',
-                'effect': lambda: self.advance_to_scene('primitive_village')
-            }
-        }
-        
-        if consequence in consequences:
-            consequence_data = consequences[consequence]
+        if consequence in self.consequences:
+            consequence_data = self.consequences[consequence]
             self.add_story_text(consequence_data['text'])
             consequence_data['effect']()
-            
+        else:
+            # Add error handling for unknown consequences
+            self.add_story_text(f"Unknown consequence: {consequence}")
+            print(f"Warning: Unknown consequence '{consequence}' encountered")
+        
         # Mark progress
         self.game_progress[consequence] = True
         
-        # Re-present choices if we're still in the same scene
-        if self.current_scene in self.scene_choices:
-            # Clear previous text and show fresh content
-            self.clear_story_text()
-            
-            # Show the consequence result
-            if consequence in consequences:
-                consequence_data = consequences[consequence]
-                self.add_story_text_top(consequence_data['text'])
-            
-            self.add_story_text_top("")
-            self.add_story_text_top("What would you like to do?")
-            self.add_story_text_top("")
-            
-            choices = self.scene_choices[self.current_scene]
-            for i, choice in enumerate(choices):
-                choice_text = f"{i+1}. {choice['text']}"
-                self.add_story_text_top(choice_text)
-            
-            self.add_story_text_top("")
-            self.add_story_text_top("Enter your choice in the box to the right.")
+    def gain_experience(self, amount):
+        """Gain experience points"""
+        self.experience += amount
+        self.add_story_text(f"You gained {amount} experience points!")
         
+        # Check for level up
+        if self.experience >= self.level * 100:
+            self.level_up()
+    
+    def level_up(self):
+        """Handle level up"""
+        self.level += 1
+        self.experience = 0
+        self.max_health += 10
+        self.health = self.max_health
+        self.add_story_text(f"Level up! You are now level {self.level}!")
+        self.add_story_text("Your health has been restored and increased!")
+    
     def gain_experience(self, amount):
         """Gain experience points"""
         self.player_experience += amount
@@ -979,7 +969,16 @@ class PlayerGameGUI:
         self.show_scene_description()
         
     def advance_to_scene(self, scene_name):
-        """Advance to a specific scene"""
+        """Advance to a specific scene with validation"""
+        if not scene_name:
+            self.add_story_text("Error: No scene name provided.")
+            return
+            
+        if scene_name not in self.scene_descriptions:
+            self.add_story_text(f"Error: Unknown scene '{scene_name}'.")
+            print(f"Warning: Attempted to advance to unknown scene '{scene_name}'")
+            return
+            
         self.current_scene = scene_name
         if scene_name not in self.visited_scenes:
             self.visited_scenes.append(scene_name)
@@ -1043,12 +1042,18 @@ class PlayerGameGUI:
         self.add_story_text("Enter your choice (1-3) in the input field above.")
     
     def handle_combat_action(self, choice):
-        """Handle combat action based on player choice"""
+        """Handle combat action based on player choice with validation"""
         if self.game_state != "in_combat":
+            self.add_story_text("You are not in combat!")
             return
             
-        if choice < 1 or choice > len(self.available_combat_skills):
-            self.add_story_text("Invalid choice! Please select 1-3.")
+        if not self.available_combat_skills:
+            self.add_story_text("No combat skills available!")
+            return
+            
+        max_skills = len(self.available_combat_skills)
+        if choice < 1 or choice > max_skills:
+            self.add_story_text(f"Invalid choice! Please select 1-{max_skills}.")
             return
             
         skill_key = self.available_combat_skills[choice - 1]
@@ -1356,27 +1361,39 @@ class PlayerGameGUI:
         self.add_story_text("Game loaded! (Load functionality to be implemented)")
         
     def handle_choice_input(self, event):
-        """Handle user input for choice selection"""
+        """Handle user input for choice selection with improved error handling"""
         try:
-            choice_number = int(self.choice_entry.get())
+            choice_text = self.choice_entry.get().strip()
+            if not choice_text:
+                self.add_story_text("Please enter a choice.")
+                return
+                
+            choice_number = int(choice_text)
             
             # Check if player is in combat
             if self.game_state == "in_combat":
                 self.handle_combat_action(choice_number)
             else:
-                # Normal scene choice handling
-                if 1 <= choice_number <= 3:
-                    # Find the choice based on the number
-                    choices = self.scene_choices[self.current_scene]
-                    if choice_number - 1 < len(choices):
-                        self.execute_choice(choices[choice_number - 1], None) # No window to destroy here
-                    else:
-                        self.add_story_text("Invalid choice number.")
+                # Normal scene choice handling with validation
+                if self.current_scene not in self.scene_choices:
+                    self.add_story_text("No choices available in this scene.")
+                    return
+                    
+                choices = self.scene_choices[self.current_scene]
+                max_choices = len(choices)
+                
+                if 1 <= choice_number <= max_choices:
+                    self.execute_choice(choices[choice_number - 1], None)
                 else:
-                    self.add_story_text("Please enter a number between 1 and 3.")
+                    self.add_story_text(f"Please enter a number between 1 and {max_choices}.")
+                    
         except ValueError:
             self.add_story_text("Please enter a valid number.")
-        self.choice_entry.delete(0, tk.END) # Clear the entry field
+        except Exception as e:
+            self.add_story_text(f"An error occurred: {str(e)}")
+            print(f"Error in handle_choice_input: {e}")
+        finally:
+            self.choice_entry.delete(0, tk.END) # Clear the entry field
         
     def run(self):
         """Start the GUI"""
