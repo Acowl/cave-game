@@ -1,0 +1,36 @@
+digraph level {
+  rankdir=LR;
+  node [shape=box, style=filled, fillcolor="#1f2d3a", fontcolor=white];
+  edge [color="#90caf9"];
+  "cave_entrance" [label="cave entrance"];
+  "skull_chamber" [label="skull chamber"];
+  "cave_in" [label="cave in"];
+  "primitive_village" [label="primitive village"];
+  "chiefs_house" [label="chiefs house"];
+  "healing_pool" [label="healing pool"];
+  "village_changed" [label="village changed"];
+  "alley" [label="alley"];
+  "armory" [label="armory"];
+  "cave_entrance" -> "cave_entrance" [label="looked around dark", color="#90caf9"];
+  "cave_entrance" -> "cave_entrance" [label="sat and cried", color="#90caf9"];
+  "cave_entrance" -> "skull_chamber" [label="entered skull chamber", color="#90caf9"];
+  "skull_chamber" -> "skull_chamber" [label="no exit visible", color="#90caf9"];
+  "skull_chamber" -> "cave_in" [label="tunnel collapse", color="#90caf9"];
+  "cave_in" -> "primitive_village" [label="escaped cave in", color="#90caf9"];
+  "primitive_village" -> "alley" [label="followed creature to alley", color="#90caf9"];
+  "primitive_village" -> "primitive_village" [label="approached armory", color="#90caf9"];
+  "primitive_village" -> "primitive_village" [label="approached chiefs house", color="#90caf9"];
+  "chiefs_house" -> "chiefs_house" [label="used chiefs house key", color="#90caf9"];
+  "chiefs_house" -> "primitive_village" [label="returned to village", color="#90caf9"];
+  "healing_pool" -> "healing_pool" [label="restored health", color="#90caf9"];
+  "healing_pool" -> "healing_pool" [label="gained magical insight", color="#90caf9"];
+  "healing_pool" -> "village_changed" [label="advanced to village changed", color="#90caf9"];
+  "village_changed" -> "village_changed" [label="confronted darkness", color="#90caf9"];
+  "village_changed" -> "village_changed" [label="protected villagers", color="#90caf9"];
+  "village_changed" -> "village_changed" [label="found corruption source", color="#90caf9"];
+  "alley" -> "alley" [label="confronted alley creature", color="#ffb74d"];
+  "alley" -> "alley" [label="sneaked past creature", color="#90caf9"];
+  "alley" -> "alley" [label="searched alley items", color="#90caf9"];
+  "armory" -> "armory" [label="used armory key", color="#90caf9"];
+  "armory" -> "primitive_village" [label="returned to village", color="#90caf9"];
+}
