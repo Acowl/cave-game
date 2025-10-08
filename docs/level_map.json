@@ -1,0 +1,213 @@
+{
+  "scene_progression": [
+    "cave_entrance",
+    "skull_chamber",
+    "primitive_village",
+    "chiefs_house",
+    "healing_pool",
+    "village_changed",
+    "alley",
+    "armory"
+  ],
+  "scenes": {
+    "cave_entrance": {
+      "description": "You wake up in a dark cave entrance, disoriented and confused. The air is cool and damp, and you can barely see your own hands in front of your face. You have no memory of how you got here.",
+      "choices": [
+        {
+          "text": "Look around",
+          "consequence": "looked_around_dark",
+          "target_scene": "cave_entrance",
+          "starts_combat": false,
+          "sim_error": false
+        },
+        {
+          "text": "Sit and cry",
+          "consequence": "sat_and_cried",
+          "target_scene": "cave_entrance",
+          "starts_combat": false,
+          "sim_error": false
+        },
+        {
+          "text": "Go towards the light at the crack",
+          "consequence": "entered_skull_chamber",
+          "target_scene": "skull_chamber",
+          "starts_combat": false,
+          "sim_error": false
+        }
+      ]
+    },
+    "skull_chamber": {
+      "description": "You enter a chamber filled with ancient skulls. The atmosphere is heavy with dark energy. The skulls seem to watch you as you move through the chamber.",
+      "choices": [
+        {
+          "text": "Look for an exit",
+          "consequence": "no_exit_visible",
+          "target_scene": "skull_chamber",
+          "starts_combat": false,
+          "sim_error": false
+        },
+        {
+          "text": "Examine the large glowing skull",
+          "consequence": "tunnel_collapse",
+          "target_scene": "cave_in",
+          "starts_combat": false,
+          "sim_error": false
+        }
+      ]
+    },
+    "cave_in": {
+      "description": "The ground shakes violently as the tunnel begins to collapse around you! Rocks and debris fall from the ceiling, and dust fills the air. You must act quickly to escape before you're buried alive.",
+      "choices": [
+        {
+          "text": "RUN",
+          "consequence": "escaped_cave_in",
+          "target_scene": "primitive_village",
+          "starts_combat": false,
+          "sim_error": false
+        }
+      ]
+    },
+    "primitive_village": {
+      "description": "You emerge from the cave into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.",
+      "choices": [
+        {
+          "text": "Follow the creature into the alley",
+          "consequence": "followed_creature_to_alley",
+          "target_scene": "alley",
+          "starts_combat": false,
+          "sim_error": false
+        },
+        {
+          "text": "Approach the armory",
+          "consequence": "approached_armory",
+          "target_scene": "primitive_village",
+          "starts_combat": false,
+          "sim_error": false
+        },
+        {
+          "text": "Approach the chief's house",
+          "consequence": "approached_chiefs_house",
+          "target_scene": "primitive_village",
+          "starts_combat": false,
+          "sim_error": false
+        }
+      ]
+    },
+    "chiefs_house": {
+      "description": "You approach the chief's house. It's the largest building in the village, decorated with tribal symbols and trophies. The chief appears to be expecting visitors.",
+      "choices": [
+        {
+          "text": "Use the chief's house key",
+          "consequence": "used_chiefs_house_key",
+          "target_scene": "chiefs_house",
+          "starts_combat": false,
+          "sim_error": false
+        },
+        {
+          "text": "Return to the primitive village",
+          "consequence": "returned_to_village",
+          "target_scene": "primitive_village",
+          "starts_combat": false,
+          "sim_error": false
+        }
+      ]
+    },
+    "healing_pool": {
+      "description": "You find a mystical healing pool. Its waters glow with magical energy. The air around it feels charged with ancient power.",
+      "choices": [
+        {
+          "text": "Drink from the healing waters",
+          "consequence": "restored_health",
+          "target_scene": "healing_pool",
+          "starts_combat": false,
+          "sim_error": false
+        },
+        {
+          "text": "Meditate by the pool",
+          "consequence": "gained_magical_insight",
+          "target_scene": "healing_pool",
+          "starts_combat": false,
+          "sim_error": false
+        },
+        {
+          "text": "Return to the village",
+          "consequence": "advanced_to_village_changed",
+          "target_scene": "village_changed",
+          "starts_combat": false,
+          "sim_error": false
+        }
+      ]
+    },
+    "village_changed": {
+      "description": "The village has changed dramatically. Dark forces have taken hold. The once peaceful settlement now feels hostile and dangerous.",
+      "choices": [
+        {
+          "text": "Confront the dark presence",
+          "consequence": "confronted_darkness",
+          "target_scene": "village_changed",
+          "starts_combat": false,
+          "sim_error": false
+        },
+        {
+          "text": "Help the remaining villagers",
+          "consequence": "protected_villagers",
+          "target_scene": "village_changed",
+          "starts_combat": false,
+          "sim_error": false
+        },
+        {
+          "text": "Seek the source of corruption",
+          "consequence": "found_corruption_source",
+          "target_scene": "village_changed",
+          "starts_combat": false,
+          "sim_error": false
+        }
+      ]
+    },
+    "alley": {
+      "description": "You find yourself in a dark, narrow alley. Shadows dance on the walls, and you can hear distant sounds echoing through the passage.",
+      "choices": [
+        {
+          "text": "Confront the creature",
+          "consequence": "confronted_alley_creature",
+          "target_scene": "alley",
+          "starts_combat": true,
+          "sim_error": false
+        },
+        {
+          "text": "Sneak past the creature",
+          "consequence": "sneaked_past_creature",
+          "target_scene": "alley",
+          "starts_combat": false,
+          "sim_error": false
+        },
+        {
+          "text": "Search for items in the alley",
+          "consequence": "searched_alley_items",
+          "target_scene": "alley",
+          "starts_combat": false,
+          "sim_error": false
+        }
+      ]
+    },
+    "armory": {
+      "description": "You enter a well-equipped armory. Weapons and armor line the walls, and the sound of metalworking echoes from the back.",
+      "choices": [
+        {
+          "text": "Use the armory key",
+          "consequence": "used_armory_key",
+          "target_scene": "armory",
+          "starts_combat": false,
+          "sim_error": false
+        },
+        {
+          "text": "Return to the primitive village",
+          "consequence": "returned_to_village",
+          "target_scene": "primitive_village",
+          "starts_combat": false,
+          "sim_error": false
+        }
+      ]
+    }
+  }
+}
