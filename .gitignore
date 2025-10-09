@@ -1,3 +1,13 @@
+# Generated GUI snapshots and reports
+/gui_snapshots/*.png
+/gui_snapshots/gallery.html
+/gui_snapshots/screenshot_report.md
+/gui_snapshots/autoplay_report.txt
+
+# Bytecode caches
+**/__pycache__/
+*.pyc
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

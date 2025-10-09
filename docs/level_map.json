@@ -99,7 +99,7 @@
         {
           "text": "Use the chief's house key",
           "consequence": "used_chiefs_house_key",
-          "target_scene": "chiefs_house",
+          "target_scene": "primitive_village",
           "starts_combat": false,
           "sim_error": false
         },
@@ -196,7 +196,7 @@
         {
           "text": "Use the armory key",
           "consequence": "used_armory_key",
-          "target_scene": "armory",
+          "target_scene": "primitive_village",
           "starts_combat": false,
           "sim_error": false
         },
