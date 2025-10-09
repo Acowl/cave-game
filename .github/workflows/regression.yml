@@ -3,7 +3,7 @@ name: Regression
 on:
   pull_request:
   push:
-    branches: [ feat/continuity-validator ]
+  workflow_dispatch:
 
 jobs:
   run-regression:
