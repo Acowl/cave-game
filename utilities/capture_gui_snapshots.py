@@ -109,7 +109,7 @@ def generate_snapshots(cfg: SnapshotConfig) -> List[Path]:
         filename = _safe_filename(scene, character, state) + ".png"
         out_path = cfg.output_dir / filename
         _capture_canvas_png(gui, out_path)
-        print(f"📸 Saved: {out_path}")
+        print(f"Saved: {out_path}")
         saved_paths.append(out_path)
 
     gui.root.destroy()
@@ -164,7 +164,7 @@ def _write_report(output_dir: Path, saved: List[Path]) -> None:
     for p in saved:
         lines.append(f"- {p.name}")
     report_path.write_text("\n".join(lines), encoding="utf-8")
-    print(f"📝 Report written: {report_path}")
+    print(f"Report written: {report_path}")
 
 
 def parse_args(argv: List[str]) -> argparse.Namespace:
@@ -201,10 +201,10 @@ def main(argv: List[str] | None = None) -> int:
     try:
         saved = generate_snapshots(cfg)
         _write_report(cfg.output_dir, saved)
-        print("\n🎉 Snapshot capture complete!")
+        print("\nSnapshot capture complete!")
         return 0
     except Exception as e:  # pragma: no cover
-        print(f"❌ Snapshot capture failed: {e}")
+        print(f"Snapshot capture failed: {e}")
         return 1
 
 

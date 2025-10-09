@@ -68,6 +68,9 @@ SHABUYA Cave Adventure is a sophisticated 2D adventure game engine built in Pyth
 - **Character Swapping**: Dynamic sprite loading and positioning
 - **Combat Simulator**: Automated encounter testing
 - **Performance Profiling**: Load time and memory usage monitoring
+- **Automated Snapshot System**: AI-assisted development with visual QA
+- **Continuity Validator**: Game progression and gating logic verification
+- **Autoplay Testing**: Headless gameplay regression testing
 
 ## 📊 Technical Specifications
 
@@ -133,6 +136,8 @@ python enhanced_gui_final.py
 - **Integration Tests**: GUI and asset loading verification
 - **Performance Tests**: Load time and memory usage benchmarks
 - **Cross-Platform Tests**: Windows, macOS, Linux compatibility
+- **Visual Regression**: Automated snapshot generation and comparison
+- **Gameplay Regression**: Headless autoplay testing with assertions
 
 ### Quality Metrics
 ```bash
@@ -144,7 +149,36 @@ python utilities/test_gui.py
 
 # Asset verification
 python utilities/verify_cleanup.py
+
+# Generate GUI snapshots for visual QA
+python utilities/capture_player_gui_snapshots.py
+
+# Run autoplay regression tests
+python utilities/regression.py
 ```
+
+### AI-Assisted Development
+
+The project includes a comprehensive snapshot system for AI-assisted development:
+
+```bash
+# Quick snapshot generation (Windows)
+capture_snapshots.bat
+
+# Quick snapshot generation (Linux/Mac)
+./capture_snapshots.sh
+
+# Analyze snapshot coverage
+python utilities/analyze_snapshots.py
+```
+
+**Key Features:**
+- Automated GUI snapshot generation for all game states
+- Visual regression testing without manual gameplay
+- AI assistant compatibility for faster development
+- Comprehensive scene coverage documentation
+
+See [`AI_SNAPSHOT_GUIDE.md`](AI_SNAPSHOT_GUIDE.md) and [`QUICK_REFERENCE.md`](QUICK_REFERENCE.md) for details.
 
 ## 📈 Development Roadmap
 
@@ -231,14 +265,23 @@ cave-game/
 │
 ├── 🛠️ Development Tools
 │   └── utilities/
-│       ├── test_gui.py             # GUI testing framework
-│       └── verify_cleanup.py       # Code quality verification
+│       ├── capture_player_gui_snapshots.py  # Automated snapshot generation
+│       ├── analyze_snapshots.py             # Snapshot analysis tool
+│       ├── autoplay_route.py                # Headless gameplay testing
+│       ├── continuity_validator.py          # Game logic validation
+│       ├── regression.py                    # Full regression suite
+│       ├── test_gui.py                      # GUI testing framework
+│       └── verify_cleanup.py                # Code quality verification
 │
 ├── 📚 Documentation
 │   ├── README.md                   # This file
+│   ├── AI_SNAPSHOT_GUIDE.md        # AI assistant snapshot system guide
+│   ├── QUICK_REFERENCE.md          # Quick reference for development
 │   ├── MVP_ROADMAP.md              # Development roadmap
 │   ├── MANUAL_TEST_GUIDE.md        # Testing procedures
 │   └── docs/                       # Technical documentation
+│       ├── level_map.json          # Scene graph data
+│       └── level_map.md            # Human-readable level map
 │
 └── 🚀 Deployment
     ├── requirements.txt            # Python dependencies

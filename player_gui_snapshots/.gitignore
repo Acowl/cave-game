@@ -1,0 +1,7 @@
+# Ignore snapshot PNG files (they're large and regeneratable)
+*.png
+
+# Keep the reports
+!player_gui_snapshots.md
+!snapshot_index.json
+

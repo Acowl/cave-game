@@ -1,0 +1,22 @@
+[1mdiff --git a/player_gui.py b/player_gui.py[m
+[1mindex 476270f..ede758b 100644[m
+[1m--- a/player_gui.py[m
+[1m+++ b/player_gui.py[m
+[36m@@ -566,7 +566,7 @@[m [mclass PlayerGameGUI:[m
+         scene_descriptions = {[m
+             "cave_entrance": "You wake up in a dark cave entrance, disoriented and confused. The air is cool and damp, and you can barely see your own hands in front of your face. You have no memory of how you got here.",[m
+             "skull_chamber": "You enter a chamber filled with ancient skulls. The atmosphere is heavy with dark energy. The skulls seem to watch you as you move through the chamber.",[m
+[31m-            "primitive_village": "You discover a primitive village. The inhabitants seem wary of outsiders. Smoke rises from cooking fires, and you can hear the sounds of daily life.",[m
+[32m+[m[32m            "primitive_village": "You emerge from the cave system into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke rising from cooking fires. The inhabitants, dressed in simple animal hides, seem wary of outsiders and watch you cautiously from doorways. As you take in the scene, you notice a small, shadowy creature with glowing eyes scurrying away towards a narrow alley between two buildings, its movements quick and furtive.",[m
+             "chiefs_house": "You approach the chief's house. It's the largest building in the village, decorated with tribal symbols and trophies. The chief appears to be expecting visitors.",[m
+             "healing_pool": "You find a mystical healing pool. Its waters glow with magical energy. The air around it feels charged with ancient power.",[m
+             "village_changed": "The village has changed dramatically. Dark forces have taken hold. The once peaceful settlement now feels hostile and dangerous.",[m
+[36m@@ -1023,7 +1023,7 @@[m [mclass PlayerGameGUI:[m
+         scene_descriptions = {[m
+             "cave_entrance": "You wake up in a dark cave entrance, disoriented and confused. The air is cool and damp, and you can barely see your own hands in front of your face. You have no memory of how you got here.",[m
+             "skull_chamber": "You enter a chamber filled with ancient skulls. The atmosphere is heavy with dark energy. The skulls seem to watch you as you move through the chamber.",[m
+[31m-            "primitive_village": "You discover a primitive village. The inhabitants seem wary of outsiders. Smoke rises from cooking fires, and you can hear the sounds of daily life.",[m
+[32m+[m[32m            "primitive_village": "You emerge from the cave system into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke rising from cooking fires. The inhabitants, dressed in simple animal hides, seem wary of outsiders and watch you cautiously from doorways. As you take in the scene, you notice a small, shadowy creature with glowing eyes scurrying away towards a narrow alley between two buildings, its movements quick and furtive.",[m
+             "chiefs_house": "You approach the chief's house. It's the largest building in the village, decorated with tribal symbols and trophies. The chief appears to be expecting visitors.",[m
+             "healing_pool": "You find a mystical healing pool. Its waters glow with magical energy. The air around it feels charged with ancient power.",[m
+             "village_changed": "The village has changed dramatically. Dark forces have taken hold. The once peaceful settlement now feels hostile and dangerous.",[m

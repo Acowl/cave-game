@@ -48,14 +48,15 @@ class PlayerGameGUI:
         # Scene descriptions - centralized to prevent duplication
         self.scene_descriptions = {
             "cave_entrance": "You wake up in a dark cave entrance, disoriented and confused. The air is cool and damp, and you can barely see your own hands in front of your face. You have no memory of how you got here.",
-            "skull_chamber": "You enter a chamber filled with ancient skulls. The atmosphere is heavy with dark energy. The skulls seem to watch you as you move through the chamber.",
+            "skull_chamber": "You squeeze through the narrow crack and enter a circular chamber lined with hundreds of ancient skulls embedded in the walls. The air is thick and oppressive, heavy with dark energy that makes your skin crawl. Each skull appears different - some human, some distinctly not - their hollow eye sockets seeming to track your every movement. In the chamber's center, a single skull sits upon a stone pedestal, larger than the others and glowing with an eerie green luminescence. The whispers of the long-dead seem to echo in your mind, warning you... or perhaps calling you closer.",
             "cave_in": "The ground shakes violently as the tunnel begins to collapse around you! Rocks and debris fall from the ceiling, and dust fills the air. You must act quickly to escape before you're buried alive.",
             "primitive_village": "You emerge from the cave into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.",
-            "chiefs_house": "You approach the chief's house. It's the largest building in the village, decorated with tribal symbols and trophies. The chief appears to be expecting visitors.",
-            "healing_pool": "You find a mystical healing pool. Its waters glow with magical energy. The air around it feels charged with ancient power.",
-            "village_changed": "The village has changed dramatically. Dark forces have taken hold. The once peaceful settlement now feels hostile and dangerous.",
-            "alley": "You find yourself in a dark, narrow alley. Shadows dance on the walls, and you can hear distant sounds echoing through the passage.",
-            "armory": "You enter a well-equipped armory. Weapons and armor line the walls, and the sound of metalworking echoes from the back."
+            "chiefs_house": "You approach the chief's house - the largest and most impressive structure in the village. Unlike the crude huts surrounding it, this building is constructed of carved stone blocks fitted together with remarkable precision. Tribal symbols and hunting trophies adorn the entrance: massive skulls of beasts you can't identify, intricate bone carvings, and colorful feathers from exotic birds. As you use the key to unlock the heavy wooden door, you're greeted by an elderly figure seated on an ornate throne of woven roots and stone. The chief's weathered face breaks into a knowing smile, as if they've been expecting you all along. 'Welcome, young warrior. The spirits told me you would come.'",
+            "healing_pool": "You discover a hidden grotto deep within the cave system. In its center lies a mystical healing pool, its crystalline waters glowing with an ethereal blue-green light that illuminates the entire chamber. Ancient runes are carved into the stone surrounding the pool, pulsing gently with the same magical energy. The air here feels different - charged with power, yet peaceful and serene. Wisps of luminescent mist rise from the water's surface, and you can hear a faint, melodic humming that seems to emanate from the pool itself. This is a place of great power, you realize - perhaps one of the last sanctuaries of pure magic in this corrupted land.",
+            "village_changed": "As you return from the healing pool, an eerie silence greets you. The primitive village you once knew has been twisted beyond recognition. The huts stand abandoned, their doorways gaping like hollow eyes. Dark tendrils of corrupted energy pulse through the ground, converging on the village center where a massive stone platform has risen from the earth. The air crackles with malevolent power. Atop the platform stands Divine Heart - an ancient being of terrible beauty. Its crystalline form pulses with dark energy, and you realize with horror that it has been here all along, hidden beneath the village, feeding on the settlement's life force. The creature's eyes lock onto you, and a voice like grinding stone echoes in your mind: 'You have come far, mortal. But your journey ends here.'",
+            "alley": "You cautiously follow the creature into a dark, narrow alley between two primitive huts. The passage is barely wide enough for you to walk through comfortably. Shadows dance on the rough stone walls as flickering torchlight from the village barely penetrates this far. Ahead, you can hear the skittering sounds of the ground dwelling creature - a small but aggressive-looking beast with matted fur, glowing red eyes, and sharp claws that scrape against the stone. It turns to face you, growling low in its throat, clearly territorial and ready to defend its den. The air is thick with tension as you consider your next move.",
+            "armory": "You unlock the heavy iron door and step into a well-stocked armory that takes your breath away. Weapons of every type line the walls - swords, axes, spears, and bows, all crafted with impressive skill. Suits of leather and chain mail armor hang on wooden stands, and shields of various sizes are mounted above them. The air smells of oil and metal. In the back, you can hear the distant sound of a forge hammer, though no smith is visible. This is clearly a place of importance to the village - their defensive strength made manifest. And there, on a special pedestal in the center of the room, you spot an ornate key that must belong to the chief's house.",
+            "epilogue": "As the last fragments of Divine Heart's crystalline form fade into nothingness, the dark energy dissipates like morning fog under the sun. The corrupted tendrils retreat into the earth, and the oppressive atmosphere lifts. You hear distant voices - the villagers are returning! They emerge from their hiding places in the surrounding forest, their faces filled with wonder and gratitude. The chief approaches you, tears streaming down weathered cheeks. 'You have saved us all,' the elder says, placing a hand on your shoulder. 'The ancient evil that slumbered beneath our village has been vanquished. You will be remembered in our songs and stories for generations to come.' As the sun breaks through the clouds for the first time in days, you realize your journey through the dark caves has led you not just to victory, but to becoming a legend. The village celebrates around you, and you know that while this adventure has ended, your story as a hero has only just begun."
         }
         
         # Initialize consequences - will be populated in __init__
@@ -320,6 +321,23 @@ class PlayerGameGUI:
                     "description": "You desperately try to escape the collapsing tunnel.",
                     "consequence": "escaped_cave_in"
                 }
+            ],
+            "epilogue": [
+                {
+                    "text": "Celebrate with the villagers",
+                    "description": "Join the celebration and accept the village's gratitude.",
+                    "consequence": "celebrated_victory"
+                },
+                {
+                    "text": "Reflect on your journey",
+                    "description": "Take a moment to think about everything you've experienced.",
+                    "consequence": "reflected_on_journey"
+                },
+                {
+                    "text": "End your adventure",
+                    "description": "Your quest is complete. Time to rest.",
+                    "consequence": "end_game"
+                }
             ]
         }
         
@@ -424,17 +442,26 @@ class PlayerGameGUI:
                                font=('Arial', 16, 'bold'), fg='#00ff88', bg='#1a1a1a')
         canvas_title.pack(pady=10)
         
-        self.canvas = tk.Canvas(canvas_frame, width=900, height=500, bg='black')
+        # Scene Description Header
+        desc_frame = tk.LabelFrame(canvas_frame, text="Scene Description", 
+                                   fg='#ffcc88', bg='#1a1a1a', font=('Arial', 11, 'bold'))
+        desc_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        
+        self.scene_desc_text = tk.Text(desc_frame, height=4, bg='#0a0a0a', fg='#cccccc',
+                                      font=('Arial', 10), wrap=tk.WORD, relief=tk.FLAT)
+        self.scene_desc_text.pack(fill=tk.X, padx=8, pady=8)
+        
+        self.canvas = tk.Canvas(canvas_frame, width=900, height=380, bg='black')
         self.canvas.pack(padx=10, pady=(0, 10))
         self.canvas.pack_propagate(False)  # Prevent canvas from shrinking
         
-        # Story text footer
-        story_frame = tk.LabelFrame(canvas_frame, text="Story & Choices", 
-                                   fg='#cccccc', bg='#1a1a1a', font=('Arial', 11, 'bold'))
+        # Story/Choices footer
+        story_frame = tk.LabelFrame(canvas_frame, text="Current Situation & Choices", 
+                                   fg='#88ccff', bg='#1a1a1a', font=('Arial', 11, 'bold'))
         story_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
         
-        self.story_text = tk.Text(story_frame, height=6, bg='#0a0a0a', fg='#cccccc',
-                                 font=('Arial', 10), wrap=tk.WORD, relief=tk.FLAT)
+        self.story_text = tk.Text(story_frame, height=5, bg='#0a0a0a', fg='#cccccc',
+                                 font=('Arial', 9), wrap=tk.WORD, relief=tk.FLAT)
         self.story_text.pack(fill=tk.X, padx=8, pady=8)
         
         # Choice input
@@ -503,31 +530,40 @@ class PlayerGameGUI:
                                    fg='#ff8888', bg='#2a2a2a', font=('Arial', 10))
         self.state_label.pack(pady=2)
         
-        # Menu buttons
-        menu_frame = tk.Frame(control_frame, bg='#2a2a2a')
-        menu_frame.pack(fill=tk.X, padx=15, pady=10)
-        
-        save_btn = tk.Button(menu_frame, text="Save Game", 
-                            command=self.save_game,
-                            bg='#44aa44', fg='white', font=('Arial', 9))
-        save_btn.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 4))
-        
-        load_btn = tk.Button(menu_frame, text="Load Game", 
-                            command=self.load_game,
-                            bg='#aa4444', fg='white', font=('Arial', 9))
-        load_btn.pack(side=tk.RIGHT, fill=tk.X, expand=True, padx=(4, 0))
+        # Menu buttons (removed save/load for MVP - will add when implemented)
         
     def load_assets(self):
         """Load all sprites and backgrounds"""
         print("Loading game assets...")
         
-        # Load sprites
+        # Load sprites with transparency
         if os.path.exists(self.sprites_dir):
             for filename in os.listdir(self.sprites_dir):
                 if filename.endswith('.png'):
                     try:
                         filepath = os.path.join(self.sprites_dir, filename)
-                        image = Image.open(filepath)
+                        image = Image.open(filepath).convert("RGBA")
+                        
+                        # Remove background by making it transparent
+                        # This removes white/light backgrounds common in sprite images
+                        datas = image.getdata()
+                        newData = []
+                        
+                        # Transparency threshold (adjust if needed: 220-250 recommended)
+                        # Higher = only removes very light colors (conservative)
+                        # Lower = removes more background but may affect sprite details
+                        TRANSPARENCY_THRESHOLD = 240
+                        
+                        for item in datas:
+                            # Change all white/near-white (background) pixels to transparent
+                            if (item[0] > TRANSPARENCY_THRESHOLD and 
+                                item[1] > TRANSPARENCY_THRESHOLD and 
+                                item[2] > TRANSPARENCY_THRESHOLD):
+                                newData.append((255, 255, 255, 0))  # Transparent
+                            else:
+                                newData.append(item)  # Keep sprite pixels
+                        
+                        image.putdata(newData)
                         image = image.resize((150, 150), Image.Resampling.LANCZOS)
                         self.sprite_cache[filename] = ImageTk.PhotoImage(image)
                     except Exception as e:
@@ -540,7 +576,7 @@ class PlayerGameGUI:
                     try:
                         filepath = os.path.join(self.backgrounds_dir, filename)
                         image = Image.open(filepath)
-                        image = image.resize((900, 650), Image.Resampling.LANCZOS)
+                        image = image.resize((900, 380), Image.Resampling.LANCZOS)
                         self.background_cache[filename] = ImageTk.PhotoImage(image)
                     except Exception as e:
                         print(f"Failed to load background {filename}: {e}")
@@ -551,20 +587,20 @@ class PlayerGameGUI:
         """Initialize all game consequences in a centralized location"""
         self.consequences = {
             'looked_around_dark': {
-                'text': 'It\'s dark, you can\'t see.',
-                'effect': lambda: None
+                'text': 'You strain your eyes in the darkness. As they adjust, you can make out rough stone walls and the faint outline of the cave opening. Your observation skills sharpen.',
+                'effect': lambda: self.gain_experience(5)
             },
             'sat_and_cried': {
-                'text': 'You cried, nothing happened.',
-                'effect': lambda: None
+                'text': 'You sink to the ground and let the frustration out. The tears flow freely, and oddly, you feel a bit better afterward - more centered and ready to face whatever comes next.',
+                'effect': lambda: self.gain_experience(5)
             },
             'entered_skull_chamber': {
                 'text': 'You entered the skull chamber.',
                 'effect': lambda: self.advance_to_skull_chamber()
             },
             'no_exit_visible': {
-                'text': 'No exit is visible.',
-                'effect': lambda: None
+                'text': 'You search the chamber walls carefully, running your hands along the cold stone. No obvious exits present themselves, but you notice strange markings on some of the skulls - perhaps ancient warnings. Your thoroughness is commendable.',
+                'effect': lambda: self.gain_experience(5)
             },
             'tunnel_collapse': {
                 'text': 'The tunnel starts to collapse!!',
@@ -611,8 +647,8 @@ class PlayerGameGUI:
                 'effect': lambda: self.gain_experience(5)
             },
             'confronted_darkness': {
-                'text': 'You confront the darkness head-on.',
-                'effect': lambda: self.gain_experience(10)
+                'text': 'You face the dark presence with courage and determination. Divine Heart emerges from the corrupted village center, its crystalline form radiating malevolent power. The final battle begins!',
+                'effect': lambda: self.start_boss_combat()
             },
             'learned_village_history': {
                 'text': 'You learn about the village\'s history.',
@@ -693,6 +729,26 @@ class PlayerGameGUI:
             'returned_to_village': {
                 'text': 'You return to the primitive village. The villagers continue their daily activities around you.',
                 'effect': lambda: self.advance_to_scene('primitive_village')
+            },
+            'protected_villagers': {
+                'text': 'You rush to help the remaining villagers, defending them from the dark forces. They flee to safety as you stand between them and the corruption. Divine Heart rises from the village center, recognizing you as a true threat.',
+                'effect': lambda: self.start_boss_combat()
+            },
+            'found_corruption_source': {
+                'text': 'You investigate the village, following the dark energy to its source. In the village center, you discover the truth - Divine Heart has been hiding here all along, feeding on the village. The ancient being emerges to confront you directly.',
+                'effect': lambda: self.start_boss_combat()
+            },
+            'celebrated_victory': {
+                'text': 'You join the villagers in celebration. They prepare a feast in your honor, and the chief presents you with a ceremonial medallion marking you as a guardian of the village. Children ask to hear tales of your battle, and you spend the evening recounting your adventures. As night falls, you feel a deep sense of accomplishment and belonging.',
+                'effect': lambda: self.gain_experience(25)
+            },
+            'reflected_on_journey': {
+                'text': 'You find a quiet spot overlooking the village and reflect on your incredible journey. From waking up confused in a dark cave to defeating an ancient evil, you\'ve grown stronger and wiser. The Divine Heart Crystal pulses gently in your hand, a reminder of the darkness you\'ve overcome and the light you\'ve brought back to this hidden valley.',
+                'effect': lambda: self.gain_experience(25)
+            },
+            'end_game': {
+                'text': 'Your adventure in SHABUYA Cave has come to an end. You have proven yourself a true hero, saved an entire village, and uncovered ancient secrets. The villagers will sing songs of your bravery for generations. Thank you for playing!',
+                'effect': lambda: self.show_end_game_screen()
             }
         }
         
@@ -741,24 +797,24 @@ class PlayerGameGUI:
         
     def show_scene_description(self):
         """Show the current scene description and choices automatically"""
-        # Clear previous text
+        # Clear both text areas
         self.clear_story_text()
+        self.scene_desc_text.config(state='normal')  # Enable editing
+        self.scene_desc_text.delete('1.0', tk.END)
         
+        # Show scene description in header
         scene_desc = self.scene_descriptions.get(self.current_scene, "You examine your surroundings carefully.")
-        self.add_story_text_top(scene_desc)
+        self.scene_desc_text.insert('1.0', scene_desc)
+        self.scene_desc_text.config(state='disabled')  # Make read-only
         
-        # If this scene has choices, show them as a numbered list
+        # Show choices in footer (compact format for readability)
         if self.current_scene in self.scene_choices:
-            self.add_story_text_top("")
-            self.add_story_text_top("What would you like to do?")
-            
             choices = self.scene_choices[self.current_scene]
             for i, choice in enumerate(choices):
                 choice_text = f"{i+1}. {choice['text']}"
-                self.add_story_text_top(choice_text)
-            
-            self.add_story_text_top("")
-            self.add_story_text_top("Enter your choice in the box to the right.")
+                self.add_story_text_compact(choice_text)
+        else:
+            self.add_story_text_compact("No choices available for this scene.")
         
     def update_display(self):
         """Update the main display"""
@@ -768,28 +824,40 @@ class PlayerGameGUI:
         bg_file = f"{self.current_scene}.png"
         if bg_file in self.background_cache:
             bg_image = self.background_cache[bg_file]
-            self.canvas.create_image(450, 250, image=bg_image)
+            self.canvas.create_image(450, 190, image=bg_image)
         else:
-            self.canvas.create_rectangle(0, 0, 900, 500, fill='#1a1a2e')
-            self.canvas.create_text(450, 250, text=f"{self.current_scene.upper()}", 
+            self.canvas.create_rectangle(0, 0, 900, 380, fill='#1a1a2e')
+            self.canvas.create_text(450, 190, text=f"{self.current_scene.upper()}", 
                                    fill='#4a4a6a', font=('Arial', 32))
         
         # Draw player sprite
         player_sprite = f"{self.player_character}_sprite.png"
         if player_sprite in self.sprite_cache:
             sprite_image = self.sprite_cache[player_sprite]
-            x, y = 350, 420
+            x, y = 300, 300
             self.canvas.create_image(x, y, image=sprite_image)
         
         # Draw enemy if in combat
         if self.game_state == "in_combat":
-            enemy_sprites = ['cave_guardian_sprite.png', 'primitive_creature_sprite.png', 
-                           'boss_divineheart_sprite.png']
-            for enemy_file in enemy_sprites:
-                if enemy_file in self.sprite_cache:
-                    enemy_image = self.sprite_cache[enemy_file]
-                    self.canvas.create_image(650, 420, image=enemy_image)
-                    break
+            # Select correct enemy sprite based on current enemy
+            enemy_sprite_map = {
+                "Divine Heart": "boss_divineheart_sprite.png",
+                "Ground Dwelling Creature": "ground creature_sprite.png",
+                "Cave Guardian": "cave_guardian_sprite.png",
+                "Primitive Creature": "primitive_creature_sprite.png"
+            }
+            
+            enemy_sprite = enemy_sprite_map.get(self.combat_enemy, "ground creature_sprite.png")
+            if enemy_sprite in self.sprite_cache:
+                enemy_image = self.sprite_cache[enemy_sprite]
+                self.canvas.create_image(600, 300, image=enemy_image)
+            else:
+                # Fallback to first available sprite
+                for enemy_file in enemy_sprite_map.values():
+                    if enemy_file in self.sprite_cache:
+                        enemy_image = self.sprite_cache[enemy_file]
+                        self.canvas.create_image(600, 300, image=enemy_image)
+                        break
         
         # Update UI labels
         self.health_label.config(text=f"Health: {self.player_health}")
@@ -1044,17 +1112,37 @@ class PlayerGameGUI:
         
         self.update_display()
     
+    def start_boss_combat(self):
+        """Start the final boss battle with Divine Heart"""
+        self.game_state = "in_combat"
+        self.combat_enemy = "Divine Heart"
+        self.combat_enemy_health = 150  # Much stronger than regular enemies
+        self.combat_turn = 0
+        
+        # Initialize available combat skills based on class
+        self.available_combat_skills = list(self.classes[self.player_character]['combat_skills'].keys())
+        
+        self.add_story_text("═══════════════════════════════════════")
+        self.add_story_text("    FINAL BATTLE: DIVINE HEART")
+        self.add_story_text("═══════════════════════════════════════")
+        self.add_story_text(f"The ancient being towers before you, its crystalline form pulsing with dark power!")
+        self.add_story_text(f"Enemy: {self.combat_enemy} (Health: {self.combat_enemy_health})")
+        self.add_story_text("This is the fight for the village's survival!")
+        self.add_story_text("")
+        self.add_story_text("Choose your combat action:")
+        
+        # Show combat choices
+        self.show_combat_choices()
+        
+        self.update_display()
+    
     def show_combat_choices(self):
         """Show combat choices based on available skills"""
-        self.add_story_text("")
-        self.add_story_text("Combat Options:")
+        self.clear_story_text()
         
         for i, skill_key in enumerate(self.available_combat_skills, 1):
             skill = self.classes[self.player_character]['combat_skills'][skill_key]
-            self.add_story_text(f"{i}. {skill['name']} - {skill['description']}")
-        
-        self.add_story_text("")
-        self.add_story_text("Enter your choice (1-3) in the input field above.")
+            self.add_story_text_compact(f"{i}. {skill['name']} - {skill['description']}")
     
     def handle_combat_action(self, choice):
         """Handle combat action based on player choice with validation"""
@@ -1157,10 +1245,28 @@ class PlayerGameGUI:
     def end_combat_victory(self):
         """End combat with victory"""
         self.add_story_text(f"You defeat the {self.combat_enemy}!")
-        self.add_story_text("The creature drops an armory key as it falls.")
-        self.inventory.append('Armory Key')
-        self.add_story_text("You pick up the armory key. This might be useful for accessing the armory building.")
-        self.gain_experience(15)
+        
+        # Different rewards for different enemies
+        if self.combat_enemy == "Ground Dwelling Creature":
+            self.add_story_text("The creature drops an armory key as it falls.")
+            self.inventory.append('Armory Key')
+            self.add_story_text("You pick up the armory key. This might be useful for accessing the armory building.")
+            self.gain_experience(15)
+        elif self.combat_enemy == "Divine Heart":
+            self.add_story_text("═══════════════════════════════════════")
+            self.add_story_text("         VICTORY!")
+            self.add_story_text("═══════════════════════════════════════")
+            self.add_story_text("The crystalline form of Divine Heart shatters into a thousand glowing fragments!")
+            self.add_story_text("The corruption dissipates from the village, and you hear the distant cheers of the villagers returning.")
+            self.add_story_text("You have saved the village and uncovered an ancient evil!")
+            self.inventory.append('Divine Heart Crystal')
+            self.add_story_text("You claim the Divine Heart Crystal as proof of your victory!")
+            self.gain_experience(100)
+            # Advance to epilogue after victory
+            self.current_scene = "epilogue"
+            self.visited_scenes.append("epilogue")
+        else:
+            self.gain_experience(15)
         
         self.game_state = "exploring"
         self.update_display()
@@ -1327,43 +1433,62 @@ class PlayerGameGUI:
         """Add text to the story display and scroll to top"""
         self.story_text.insert(tk.END, f"{text}\n\n")
         self.story_text.see("1.0")
+    
+    def add_story_text_compact(self, text):
+        """Add text to the story display with minimal spacing (for choice lists)"""
+        self.story_text.insert(tk.END, f"{text}\n")
+        self.story_text.see("1.0")
         
     def clear_story_text(self):
         """Clear the story text display"""
         self.story_text.delete(1.0, tk.END)
+    
+    def show_end_game_screen(self):
+        """Show the end game victory screen"""
+        # Clear the window
+        for widget in self.root.winfo_children():
+            widget.destroy()
         
-    def show_scene_description(self):
-        """Show the current scene description and choices automatically"""
-        # Clear previous text
-        self.clear_story_text()
+        # Create victory screen
+        victory_frame = tk.Frame(self.root, bg='#0a0a0a')
+        victory_frame.pack(fill=tk.BOTH, expand=True)
         
-        scene_descriptions = {
-            "cave_entrance": "You wake up in a dark cave entrance, disoriented and confused. The air is cool and damp, and you can barely see your own hands in front of your face. You have no memory of how you got here.",
-            "skull_chamber": "You enter a chamber filled with ancient skulls. The atmosphere is heavy with dark energy. The skulls seem to watch you as you move through the chamber.",
-            "cave_in": "The ground shakes violently as the tunnel begins to collapse around you! Rocks and debris fall from the ceiling, and dust fills the air. You must act quickly to escape before you're buried alive.",
-            "primitive_village": "You emerge from the cave into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.",
-            "chiefs_house": "You approach the chief's house. It's the largest building in the village, decorated with tribal symbols and trophies. The chief appears to be expecting visitors.",
-            "healing_pool": "You find a mystical healing pool. Its waters glow with magical energy. The air around it feels charged with ancient power.",
-            "village_changed": "The village has changed dramatically. Dark forces have taken hold. The once peaceful settlement now feels hostile and dangerous.",
-            "alley": "You find yourself in a dark, narrow alley. Shadows dance on the walls, and you can hear distant sounds echoing through the passage.",
-            "armory": "You enter a well-equipped armory. Weapons and armor line the walls, and the sound of metalworking echoes from the back."
-        }
+        # Title
+        title = tk.Label(victory_frame, text="VICTORY!", 
+                        font=('Arial', 48, 'bold'), fg='#ffdd00', bg='#0a0a0a')
+        title.pack(pady=50)
         
-        scene_desc = scene_descriptions.get(self.current_scene, "You examine your surroundings carefully.")
-        self.add_story_text_top(scene_desc)
+        # Victory message
+        msg_frame = tk.Frame(victory_frame, bg='#0a0a0a')
+        msg_frame.pack(pady=20)
         
-        # If this scene has choices, show them immediately
-        if self.current_scene in self.scene_choices:
-            self.add_story_text_top("")
-            self.add_story_text_top("What would you like to do?")
-            
-            choices = self.scene_choices[self.current_scene]
-            for i, choice in enumerate(choices):
-                choice_text = f"{i+1}. {choice['text']}"
-                self.add_story_text_top(choice_text)
-            
-            self.add_story_text_top("")
-            self.add_story_text_top("Enter your choice in the box to the right.")
+        victory_text = [
+            "Congratulations, Hero!",
+            "",
+            f"You have completed SHABUYA Cave Adventure as a {self.classes[self.player_character]['name']}!",
+            "",
+            f"Final Level: {self.player_level}",
+            f"Total Experience: {self.player_experience}",
+            "",
+            "You have:",
+            "- Defeated the ancient evil Divine Heart",
+            "- Saved the primitive village from corruption", 
+            "- Become a legend among the people",
+            "",
+            "Thank you for playing!"
+        ]
+        
+        for line in victory_text:
+            label = tk.Label(msg_frame, text=line, 
+                           font=('Arial', 14), fg='#cccccc', bg='#0a0a0a')
+            label.pack()
+        
+        # Exit button
+        exit_btn = tk.Button(victory_frame, text="Exit Game", 
+                            command=self.root.quit,
+                            bg='#cc4444', fg='white', font=('Arial', 14, 'bold'),
+                            padx=30, pady=10)
+        exit_btn.pack(pady=30)
         
     def save_game(self):
         """Save the current game state"""

@@ -1,0 +1,15 @@
+Selected class: warrior
+Entered skull chamber
+Triggered cave_in
+Escaped to primitive_village
+Attempted chief's house without key (expect gated)
+Moved to alley
+Started alley combat
+Combat ended
+Approached armory
+Used armory key and looted contents
+Returned to village
+Approached chief's house (with key)
+Entered chief's house and received blessing
+Advanced to healing pool
+Advanced to village_changed

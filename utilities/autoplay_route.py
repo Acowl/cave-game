@@ -119,13 +119,13 @@ def main() -> int:
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text("\n".join(log_lines), encoding="utf-8")
         print("\n".join(log_lines))
-        print(f"\n✅ Autoplay route completed. Report: {out}")
+        print(f"\nAutoplay route completed. Report: {out}")
         return 0
     except AssertionError as ae:
-        print("❌ Autoplay assertion failed:", ae)
+        print("Autoplay assertion failed:", ae)
         return 2
     except Exception as e:
-        print("❌ Autoplay crashed:", e)
+        print("Autoplay crashed:", e)
         return 1
 
 

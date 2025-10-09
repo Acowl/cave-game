@@ -1,0 +1,70 @@
+{
+  "total_snapshots": 13,
+  "snapshots": [
+    {
+      "filename": "00_title_screen.png",
+      "description": "Title screen with class selection",
+      "path": "00_title_screen.png"
+    },
+    {
+      "filename": "01_war_class_selected.png",
+      "description": "Warrior class selected",
+      "path": "01_war_class_selected.png"
+    },
+    {
+      "filename": "02_war_cave_entrance.png",
+      "description": "Warrior at cave entrance",
+      "path": "02_war_cave_entrance.png"
+    },
+    {
+      "filename": "03_war_skull_chamber.png",
+      "description": "Warrior in skull chamber",
+      "path": "03_war_skull_chamber.png"
+    },
+    {
+      "filename": "04_war_cave_in.png",
+      "description": "Warrior during cave-in",
+      "path": "04_war_cave_in.png"
+    },
+    {
+      "filename": "05_war_primitive_village.png",
+      "description": "Warrior at primitive village",
+      "path": "05_war_primitive_village.png"
+    },
+    {
+      "filename": "06_war_alley.png",
+      "description": "Warrior in alley",
+      "path": "06_war_alley.png"
+    },
+    {
+      "filename": "07_war_combat.png",
+      "description": "Warrior in combat",
+      "path": "07_war_combat.png"
+    },
+    {
+      "filename": "08_war_armory.png",
+      "description": "Warrior at armory",
+      "path": "08_war_armory.png"
+    },
+    {
+      "filename": "09_war_chiefs_house.png",
+      "description": "Warrior at chief's house",
+      "path": "09_war_chiefs_house.png"
+    },
+    {
+      "filename": "10_war_healing_pool.png",
+      "description": "Warrior at healing pool",
+      "path": "10_war_healing_pool.png"
+    },
+    {
+      "filename": "11_war_village_changed.png",
+      "description": "Warrior at changed village",
+      "path": "11_war_village_changed.png"
+    },
+    {
+      "filename": "12_war_epilogue.png",
+      "description": "Warrior at epilogue",
+      "path": "12_war_epilogue.png"
+    }
+  ]
+}
