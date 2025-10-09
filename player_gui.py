@@ -917,6 +917,21 @@ class PlayerGameGUI:
             consequence_data = self.consequences[consequence]
             self.add_story_text(consequence_data['text'])
             consequence_data['effect']()
+            # Continuity validation
+            try:
+                from utilities.continuity_validator import ContinuityValidator
+                ok, message = ContinuityValidator.validate(self)
+                if not ok:
+                    # Revert to a safe state: return to primitive_village exploration
+                    self.add_story_text(message or "This action is not allowed right now.")
+                    self.current_scene = "primitive_village"
+                    self.game_state = "exploring"
+                    self.update_display()
+                    self.show_scene_description()
+                    return
+            except Exception as _e:
+                # Non-fatal: continue without blocking gameplay
+                pass
         else:
             # Add error handling for unknown consequences
             self.add_story_text(f"Unknown consequence: {consequence}")

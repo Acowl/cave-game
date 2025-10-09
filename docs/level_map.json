@@ -209,5 +209,23 @@
         }
       ]
     }
+  },
+  "rules": {
+    "prerequisites": {
+      "scenes": {
+        "armory": [
+          "Armory Key"
+        ],
+        "chiefs_house": [
+          "Chief's House Key"
+        ]
+      }
+    },
+    "combat_scenes": [
+      "alley"
+    ],
+    "revisit": {
+      "blocked": []
+    }
   }
 }

@@ -51,6 +51,12 @@ def run_route(log_lines: List[str]) -> None:
     log_lines.append("Escaped to primitive_village")
     assert gui.current_scene == "primitive_village"
 
+    # Try invalid: approach chief's house without key (should gate and remain in village)
+    prev_scene = gui.current_scene
+    gui.handle_consequence("approached_chiefs_house")
+    log_lines.append("Attempted chief's house without key (expect gated)")
+    assert gui.current_scene == "primitive_village", "Chief's house should be gated without key"
+
     # Follow creature to alley → start combat and win to obtain Armory Key
     gui.handle_consequence("followed_creature_to_alley")
     log_lines.append("Moved to alley")
@@ -69,29 +75,25 @@ def run_route(log_lines: List[str]) -> None:
     assert gui.game_state == "exploring"
     assert "Armory Key" in gui.inventory
 
-    # Return to village (automatic after combat description) and approach armory
+    # Approach armory (now allowed) and use key to obtain Chief's House Key
     gui.handle_consequence("approached_armory")
     log_lines.append("Approached armory")
-    # Either enters armory or stays in village depending on key; with key we should proceed
     if gui.current_scene != "armory":
-        # If logic kept us in village, manually advance using key path
         gui.advance_to_scene("armory")
     assert gui.current_scene == "armory"
 
-    # Use armory key to obtain Chief's House Key
     gui.handle_consequence("used_armory_key")
     log_lines.append("Used armory key and looted contents")
     assert "Chief's House Key" in gui.inventory
 
-    # Return to village then enter chief's house
+    # Return to village then enter chief's house (now allowed)
     gui.handle_consequence("returned_to_village")
     log_lines.append("Returned to village")
     assert gui.current_scene == "primitive_village"
 
     gui.handle_consequence("approached_chiefs_house")
-    log_lines.append("Approached chief's house")
+    log_lines.append("Approached chief's house (with key)")
 
-    # Access chief's house and verify health/experience changes
     gui.handle_consequence("used_chiefs_house_key")
     log_lines.append("Entered chief's house and received blessing")
     assert gui.current_scene == "chiefs_house"
