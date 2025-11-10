@@ -38,6 +38,7 @@ class PlayerGameGUI:
         self.equipped_armor = None
         self.equipped_accessories = []
         self.visited_scenes = []
+        self.seen_scenes = set()
         
         # Combat state
         self.combat_enemy = None
@@ -56,6 +57,18 @@ class PlayerGameGUI:
             "village_changed": "The village has changed dramatically. Dark forces have taken hold. The once peaceful settlement now feels hostile and dangerous.",
             "alley": "You find yourself in a dark, narrow alley. Shadows dance on the walls, and you can hear distant sounds echoing through the passage.",
             "armory": "You enter a well-equipped armory. Weapons and armor line the walls, and the sound of metalworking echoes from the back."
+        }
+
+        self.scene_revisit_descriptions = {
+            "cave_entrance": "You are back at the cave entrance. The shadows feel familiar now, and the cold air bites a little less.",
+            "skull_chamber": "Once again you stand among the silent skulls, their empty eyes tracking your every move.",
+            "cave_in": "The collapsed tunnel remains sealed. Dust still lingers in the air from the earlier cave-in.",
+            "primitive_village": "The villagers continue with their routines, offering cautious glances as you return to the settlement.",
+            "chiefs_house": "The chief's house stands resolute. Its decorated walls remind you of the conversations held within.",
+            "healing_pool": "The healing pool continues to shimmer softly. The magic here feels calmer on your return.",
+            "village_changed": "The corrupted village greets you with the same oppressive aura. The darkness has not lifted.",
+            "alley": "You retrace your steps through the alley. Familiar shadows flicker along the stone walls.",
+            "armory": "Weapons still line the walls. The smith's tools rest exactly where you left them."
         }
         
         # Initialize consequences - will be populated in __init__
@@ -701,6 +714,7 @@ class PlayerGameGUI:
         self.current_scene = "cave_entrance"
         self.game_state = "exploring"
         self.visited_scenes = ["cave_entrance"]
+        self.seen_scenes = set()
         self.game_progress = {
             'visited_village': False,
             'defeated_guardian': False,
@@ -743,20 +757,32 @@ class PlayerGameGUI:
         """Show the current scene description and choices automatically"""
         # Clear previous text
         self.clear_story_text()
-        
-        scene_desc = self.scene_descriptions.get(self.current_scene, "You examine your surroundings carefully.")
+
+        first_visit = self.current_scene not in self.seen_scenes
+        if first_visit:
+            self.seen_scenes.add(self.current_scene)
+            scene_desc = self.scene_descriptions.get(
+                self.current_scene,
+                "You examine your surroundings carefully."
+            )
+        else:
+            scene_desc = self.scene_revisit_descriptions.get(
+                self.current_scene,
+                f"You revisit {self.current_scene.replace('_', ' ').title()}."
+            )
+
         self.add_story_text_top(scene_desc)
-        
-        # If this scene has choices, show them as a numbered list
+
+        # If this scene has choices, show them immediately
         if self.current_scene in self.scene_choices:
             self.add_story_text_top("")
             self.add_story_text_top("What would you like to do?")
-            
+
             choices = self.scene_choices[self.current_scene]
             for i, choice in enumerate(choices):
                 choice_text = f"{i+1}. {choice['text']}"
                 self.add_story_text_top(choice_text)
-            
+
             self.add_story_text_top("")
             self.add_story_text_top("Enter your choice in the box to the right.")
         
@@ -942,30 +968,20 @@ class PlayerGameGUI:
         
     def gain_experience(self, amount):
         """Gain experience points"""
-        self.experience += amount
+        self.player_experience += amount
         self.add_story_text(f"You gained {amount} experience points!")
         
         # Check for level up
-        if self.experience >= self.level * 100:
+        if self.player_experience >= 100:
             self.level_up()
     
     def level_up(self):
         """Handle level up"""
-        self.level += 1
-        self.experience = 0
-        self.max_health += 10
-        self.health = self.max_health
-        self.add_story_text(f"Level up! You are now level {self.level}!")
-        self.add_story_text("Your health has been restored and increased!")
-    
-    def gain_experience(self, amount):
-        """Gain experience points"""
-        self.player_experience += amount
-        self.add_story_text(f"You gain {amount} experience points!")
+        self.player_level += 1
+        self.player_experience = 0
+        self.player_health = self.classes[self.player_character]['health']  # Restore to max
+        self.add_story_text(f"Level up! You are now level {self.player_level}! Your {self.player_ability} has grown stronger!")
         
-        if self.player_experience >= 100:
-            self.level_up()
-            
     def restore_health(self, amount):
         """Restore health"""
         old_health = self.player_health
@@ -1311,13 +1327,6 @@ class PlayerGameGUI:
         self.game_state = "exploring"
         self.update_display()
         
-    def level_up(self):
-        """Level up the player"""
-        self.player_level += 1
-        self.player_experience = 0
-        self.player_health = self.classes[self.player_character]['health']  # Restore to max
-        self.add_story_text(f"Level up! You are now level {self.player_level}! Your {self.player_ability} has grown stronger!")
-        
     def add_story_text(self, text):
         """Add text to the story display"""
         self.story_text.insert(tk.END, f"{text}\n\n")
@@ -1331,39 +1340,6 @@ class PlayerGameGUI:
     def clear_story_text(self):
         """Clear the story text display"""
         self.story_text.delete(1.0, tk.END)
-        
-    def show_scene_description(self):
-        """Show the current scene description and choices automatically"""
-        # Clear previous text
-        self.clear_story_text()
-        
-        scene_descriptions = {
-            "cave_entrance": "You wake up in a dark cave entrance, disoriented and confused. The air is cool and damp, and you can barely see your own hands in front of your face. You have no memory of how you got here.",
-            "skull_chamber": "You enter a chamber filled with ancient skulls. The atmosphere is heavy with dark energy. The skulls seem to watch you as you move through the chamber.",
-            "cave_in": "The ground shakes violently as the tunnel begins to collapse around you! Rocks and debris fall from the ceiling, and dust fills the air. You must act quickly to escape before you're buried alive.",
-            "primitive_village": "You emerge from the cave into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.",
-            "chiefs_house": "You approach the chief's house. It's the largest building in the village, decorated with tribal symbols and trophies. The chief appears to be expecting visitors.",
-            "healing_pool": "You find a mystical healing pool. Its waters glow with magical energy. The air around it feels charged with ancient power.",
-            "village_changed": "The village has changed dramatically. Dark forces have taken hold. The once peaceful settlement now feels hostile and dangerous.",
-            "alley": "You find yourself in a dark, narrow alley. Shadows dance on the walls, and you can hear distant sounds echoing through the passage.",
-            "armory": "You enter a well-equipped armory. Weapons and armor line the walls, and the sound of metalworking echoes from the back."
-        }
-        
-        scene_desc = scene_descriptions.get(self.current_scene, "You examine your surroundings carefully.")
-        self.add_story_text_top(scene_desc)
-        
-        # If this scene has choices, show them immediately
-        if self.current_scene in self.scene_choices:
-            self.add_story_text_top("")
-            self.add_story_text_top("What would you like to do?")
-            
-            choices = self.scene_choices[self.current_scene]
-            for i, choice in enumerate(choices):
-                choice_text = f"{i+1}. {choice['text']}"
-                self.add_story_text_top(choice_text)
-            
-            self.add_story_text_top("")
-            self.add_story_text_top("Enter your choice in the box to the right.")
         
     def save_game(self):
         """Save the current game state"""

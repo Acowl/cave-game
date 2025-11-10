@@ -1,0 +1,59 @@
+{
+  "file_analysis": {
+    "duplicates": [
+      [
+        "cave entrance.png",
+        "cave_entrance.png"
+      ],
+      [
+        "primitive village.png",
+        "primitive_village.png"
+      ],
+      [
+        "primitive viillage (cosmic).png",
+        "primitive_village.png"
+      ],
+      [
+        "chiefs house.png",
+        "chief_house.png"
+      ],
+      [
+        "healing pool.png",
+        "healing_pool.png"
+      ],
+      [
+        "skull chamber.png",
+        "skull_chamber.png"
+      ]
+    ],
+    "pycache_dirs": [
+      "C:\\game\\cave-game\\__pycache__",
+      "C:\\game\\cave-game\\utilities\\__pycache__"
+    ]
+  },
+  "image_analysis": {
+    "corrupted": [],
+    "valid": [
+      "alley.png",
+      "armory.png",
+      "cave entrance.png",
+      "cave_entrance.png",
+      "chiefs house.png",
+      "chief_house.png",
+      "healing pool.png",
+      "healing_pool.png",
+      "menu.png",
+      "primitive viillage (cosmic).png",
+      "primitive village.png",
+      "primitive_village.png",
+      "skull chamber.png",
+      "skull_chamber.png",
+      "village_changed.png"
+    ]
+  },
+  "scene_analysis": {
+    "missing_descriptions": [],
+    "has_revisiting_logic": true,
+    "revisiting_works": false
+  }
+}

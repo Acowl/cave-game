@@ -1,0 +1,261 @@
+# SHABUYA Cave Adventure - Cursor Multi-Agent Rules
+
+## Project Overview
+SHABUYA Cave Adventure is a professional-grade Python game engine demonstrating advanced GUI architecture, modular design patterns, and scalable game development practices. The project features dual-mode gameplay (development sandbox + player experience) with comprehensive asset management and testing infrastructure.
+
+## Project Structure
+
+### Core Game Files
+- `player_gui.py` - Main player interface (1,550+ lines, complete MVP) - CRITICAL FILE, requires coordination
+- `game_launcher.py` - Application entry point - CRITICAL FILE, requires coordination
+- `enhanced_gui_final.py` - Development sandbox GUI
+- `distribution/` - Modular game components:
+  - `combat.py` - Combat system logic
+  - `scenes.py` - Scene management and progression
+  - `player.py` - Player character system
+  - `item.py` - Item and inventory system
+  - `config.py` - Game configuration constants (SHARED STATE, requires coordination)
+  - `gui.py` - Distribution GUI system
+  - `ui.py` - Text-based interface
+
+### Assets
+- `assets/sprites/` - Character sprites (64x64 pixels, transparent PNG)
+- `assets/backgrounds/` - Scene backgrounds (400x300 pixels)
+- `assets/icons/` - Game icons
+
+### Testing
+- `tests/unit/` - Unit test suite (14+ test files)
+- `tests/integration/` - Integration tests
+- `tests/assets/` - Test data files
+
+### Utilities
+- `utilities/` - Development and testing tools
+
+### Documentation
+- `docs/` - Technical documentation
+- `MVP_ROADMAP.md` - Current development priorities and status
+- `README.md` - Project overview
+- `MANUAL_TEST_GUIDE.md` - Testing procedures
+
+## Code Style Guidelines
+
+### Python Standards
+- **Python Version**: 3.11+ required
+- **Type Hints**: Use type hints for function parameters and return types
+- **Docstrings**: All modules, classes, and public functions must have docstrings
+- **Naming Conventions**:
+  - Classes: PascalCase (e.g., `PlayerGameGUI`)
+  - Functions/Methods: snake_case (e.g., `display_scene`)
+  - Constants: UPPER_SNAKE_CASE (e.g., `STAT_REQUIREMENT`)
+  - Private methods: Leading underscore (e.g., `_initialize_consequences`)
+
+### Tkinter Patterns
+- Use `tk.Tk()` for root window
+- Configure window with `.geometry()` and `.configure(bg='#0a0a0a')`
+- Use `ImageTk.PhotoImage` from PIL for displaying images
+- Cache images in dictionaries to prevent garbage collection
+- Use `ttk` widgets for better styling when appropriate
+
+### Code Organization
+- Follow MVC (Model-View-Controller) separation
+- Keep UI logic separate from game logic
+- Use modular imports (from `distribution/` modules)
+- Centralize configuration in `config.py`
+- Avoid code duplication - use shared functions/classes
+
+### Import Patterns
+```python
+# Standard library imports
+import tkinter as tk
+from tkinter import messagebox, ttk
+import os
+import json
+import random
+
+# Third-party imports
+from PIL import Image, ImageTk
+
+# Local imports (from distribution/)
+from distribution.combat import execute_combat
+from distribution.scenes import setup_scenes
+from distribution.player import Player
+```
+
+## Architecture Principles
+
+### Modular Design
+- **Separation of Concerns**: UI rendering separate from game logic
+- **Single Responsibility**: Each module has one clear purpose
+- **Dependency Injection**: Pass dependencies rather than hardcoding
+- **Interface Contracts**: Define clear interfaces between modules
+
+### Design Patterns Used
+- **MVC Architecture**: Model-View-Controller separation
+- **Observer Pattern**: Event-driven game state management
+- **Factory Pattern**: Dynamic asset loading and character creation
+- **Strategy Pattern**: Pluggable combat and interaction systems
+- **Singleton Pattern**: Asset cache and game state management
+
+### Asset Management
+- **Sprite Requirements**: 64x64 pixels, transparent PNG format
+- **Background Requirements**: 400x300 pixels
+- **Asset Paths**: Use relative paths from repository root
+- **Caching**: Cache loaded images in dictionaries to prevent reloading
+- **Asset Loading**: Handle missing assets gracefully with fallbacks
+
+### Game State Management
+- Centralize game state in `PlayerGameGUI` class
+- Use dictionaries for scene descriptions and consequences
+- Track player progress in `game_progress` dictionary
+- Maintain visited scenes list for progression tracking
+
+## Testing Requirements
+
+### Test Coverage Target
+- **Goal**: 95% coverage of core game logic
+- **Tools**: pytest framework
+- **Location**: All tests in `tests/` directory
+
+### Test Organization
+- **Unit Tests**: `tests/unit/` - Test individual modules in isolation
+- **Integration Tests**: `tests/integration/` - Test module interactions
+- **Test Data**: `tests/assets/` - Input files and test fixtures
+
+### Running Tests
+```bash
+# Run all tests
+python -m pytest tests/ -v
+
+# Run specific test file
+python -m pytest tests/unit/test_player_gui.py -v
+
+# Run with coverage
+python -m pytest tests/ --cov=distribution --cov=player_gui
+```
+
+### Testing Best Practices
+- Test all public methods
+- Test edge cases and error conditions
+- Use fixtures for common test setup
+- Mock external dependencies (file I/O, GUI components)
+- Test both success and failure paths
+
+## Critical Files Requiring Coordination
+
+### Multi-Agent Coordination Points
+When working with multiple agents, these files require coordination:
+
+1. **`player_gui.py`** - Integration point for UI, Combat, and Inventory agents
+   - Check `.cursor/tasks/ACTIVE_TASKS.md` before modifying
+   - Coordinate with agents working on combat or inventory systems
+
+2. **`distribution/config.py`** - Shared configuration constants
+   - Any changes must be coordinated with all agents
+   - Document changes in `.cursor/comms/change_log.md`
+
+3. **`distribution/player.py`** - Shared player state
+   - Coordinate with Combat and Inventory agents
+   - Check for active tasks before modifying
+
+4. **`game_launcher.py`** - Application entry point
+   - Coordinate with UI agent for launcher changes
+   - Ensure compatibility with both player and dev modes
+
+## Development Priorities
+
+### Current Status (from MVP_ROADMAP.md)
+- ✅ Core player experience complete
+- ✅ Class selection system implemented
+- ✅ Combat system functional
+- ✅ Scene progression working
+- 🔄 Next priorities: Weapon acquisition, Enhanced combat, Inventory system
+
+### Priority Tasks
+1. Check `MVP_ROADMAP.md` for current development priorities
+2. Review `.cursor/tasks/ACTIVE_TASKS.md` for active work
+3. Follow the roadmap for feature implementation order
+
+## Multi-Agent Workflow
+
+### Before Starting Work
+1. Check `.cursor/tasks/ACTIVE_TASKS.md` for conflicts
+2. Review your agent role definition in `.cursor/agents/`
+3. Create a task entry if modifying shared files
+4. Review `docs/multi-agent/INTEGRATION_POINTS.md` for coordination needs
+
+### Agent Role Definitions
+- Agent roles defined in `.cursor/agents/` directory
+- Each agent has primary scope, modification permissions, and forbidden files
+- Review agent-specific documentation before starting work
+
+### Communication Protocol
+- Document significant changes in `.cursor/comms/change_log.md`
+- Update task status in `.cursor/tasks/ACTIVE_TASKS.md`
+- Coordinate with other agents before modifying shared files
+
+## Error Handling
+
+### GUI Errors
+- Use `messagebox` for user-facing errors
+- Log errors to console for debugging
+- Provide fallback behavior when assets fail to load
+
+### Game Logic Errors
+- Validate inputs before processing
+- Handle edge cases gracefully
+- Use try-except blocks for file operations
+- Provide meaningful error messages
+
+## Performance Considerations
+
+### Asset Loading
+- Cache loaded images to prevent reloading
+- Use lazy loading for non-critical assets
+- Optimize image sizes before loading
+
+### GUI Responsiveness
+- Use `after()` for non-blocking operations
+- Avoid blocking operations in main thread
+- Update UI incrementally for long operations
+
+## Documentation Standards
+
+### Code Documentation
+- All public functions must have docstrings
+- Include parameter descriptions and return types
+- Document exceptions that may be raised
+
+### Project Documentation
+- Update `README.md` when adding major features
+- Update `MVP_ROADMAP.md` when completing tasks
+- Document API changes in `docs/multi-agent/INTEGRATION_POINTS.md`
+
+## Git Workflow
+
+### Commit Messages
+- Use clear, descriptive commit messages
+- Reference task IDs when applicable
+- Group related changes in single commits
+
+### Branching Strategy
+- Use feature branches for new development
+- Merge to main after testing
+- Coordinate merges when multiple agents work on same files
+
+## References
+
+### Key Documentation Files
+- `MVP_ROADMAP.md` - Current development status and priorities
+- `README.md` - Project overview and setup instructions
+- `docs/multi-agent/MULTI_AGENT_GUIDE.md` - Multi-agent workflow guide
+- `docs/multi-agent/DEPENDENCY_MAP.md` - Module dependencies
+- `docs/multi-agent/INTEGRATION_POINTS.md` - Integration points between agents
+
+### Agent-Specific Documentation
+- `.cursor/agents/agent-ui-ux.md` - UI/UX agent role
+- `.cursor/agents/agent-combat.md` - Combat system agent role
+- `.cursor/agents/agent-inventory.md` - Inventory/items agent role
+- `.cursor/agents/agent-testing.md` - Testing/QA agent role
+- `.cursor/agents/agent-documentation.md` - Documentation agent role
+- `.cursor/agents/agent-assets.md` - Asset management agent role
+
