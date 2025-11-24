@@ -1,0 +1,42 @@
+name: DevSecOps Pipeline
+
+on: [push, pull_request]
+
+jobs:
+  security-and-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 🛡️ Security - Dependency Scan (SCA)
+      # Checks if any installed libraries have known vulnerabilities
+      run: safety check
+
+    - name: 🛡️ Security - Code Scan (SAST)
+      # Scans your code for common security issues
+      # Skipping B101 (asserts) as they are common in non-production game logic
+      run: bandit -r . -s B101
+
+    - name: 🎨 Quality - Code Formatting
+      # Checks if code follows Black formatting standards
+      run: black . --check
+
+    - name: 🔍 Quality - Linting
+      # Checks for syntax errors and style issues
+      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    - name: 🧪 Testing - Unit Tests
+      # Runs your test suite
+      run: pytest
+

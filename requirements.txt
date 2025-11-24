@@ -1,0 +1,18 @@
+# SHABUYA Cave Adventure - Project Requirements
+
+# --- Game Dependencies ---
+# Moving to Community Edition for better performance in the rewrite
+pygame-ce>=2.4.0
+Pillow>=10.0.0
+
+# --- DevSecOps: Linting & Formatting ---
+flake8>=6.0.0
+black>=23.0.0
+
+# --- DevSecOps: Testing ---
+pytest>=7.0.0
+pytest-cov>=4.1.0
+
+# --- DevSecOps: Security ---
+bandit>=1.7.5     # SAST (Static Application Security Testing)
+safety>=2.3.0     # SCA (Software Composition Analysis)
