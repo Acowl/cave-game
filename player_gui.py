@@ -1,0 +1,1552 @@
+#!/usr/bin/env python3
+"""
+PLAYER GUI - Linear Gameplay Experience
+=====================================
+A player-focused GUI that provides linear, progressive gameplay
+instead of the development sandbox.
+"""
+
+import tkinter as tk
+from tkinter import messagebox, ttk
+import os
+from PIL import Image, ImageTk
+import random
+import json
+
+class PlayerGameGUI:
+    def __init__(self):
+        print("Initializing Player Game GUI...")
+        
+        self.root = tk.Tk()
+        self.root.title("SHABUYA Cave Adventure - Player Mode")
+        self.root.geometry("1200x800")
+        self.root.configure(bg='#0a0a0a')
+        
+        # Asset paths
+        self.sprites_dir = "assets/sprites"
+        self.backgrounds_dir = "assets/backgrounds"
+        
+        # Game state
+        self.player_character = None  # Will be set after class selection
+        self.current_scene = "cave_entrance"
+        self.game_state = "exploring"
+        self.player_health = 100
+        self.player_level = 1
+        self.player_experience = 0
+        self.inventory = []
+        self.equipped_weapon = None
+        self.equipped_armor = None
+        self.equipped_accessories = []
+        self.visited_scenes = []
+        
+        # Combat state
+        self.combat_enemy = None
+        self.combat_enemy_health = 0
+        self.combat_turn = 0
+        self.available_combat_skills = []
+        
+        # Scene descriptions - centralized to prevent duplication
+        self.scene_descriptions = {
+            "cave_entrance": "You wake up in a dark cave entrance, disoriented and confused. The air is cool and damp, and you can barely see your own hands in front of your face. You have no memory of how you got here.",
+            "skull_chamber": "You squeeze through the narrow crack and enter a circular chamber lined with hundreds of ancient skulls embedded in the walls. The air is thick and oppressive, heavy with dark energy that makes your skin crawl. Each skull appears different - some human, some distinctly not - their hollow eye sockets seeming to track your every movement. In the chamber's center, a single skull sits upon a stone pedestal, larger than the others and glowing with an eerie green luminescence. The whispers of the long-dead seem to echo in your mind, warning you... or perhaps calling you closer.",
+            "cave_in": "The ground shakes violently as the tunnel begins to collapse around you! Rocks and debris fall from the ceiling, and dust fills the air. You must act quickly to escape before you're buried alive.",
+            "primitive_village": "You emerge from the cave into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.",
+            "chiefs_house": "You approach the chief's house - the largest and most impressive structure in the village. Unlike the crude huts surrounding it, this building is constructed of carved stone blocks fitted together with remarkable precision. Tribal symbols and hunting trophies adorn the entrance: massive skulls of beasts you can't identify, intricate bone carvings, and colorful feathers from exotic birds. As you use the key to unlock the heavy wooden door, you're greeted by an elderly figure seated on an ornate throne of woven roots and stone. The chief's weathered face breaks into a knowing smile, as if they've been expecting you all along. 'Welcome, young warrior. The spirits told me you would come.'",
+            "healing_pool": "You discover a hidden grotto deep within the cave system. In its center lies a mystical healing pool, its crystalline waters glowing with an ethereal blue-green light that illuminates the entire chamber. Ancient runes are carved into the stone surrounding the pool, pulsing gently with the same magical energy. The air here feels different - charged with power, yet peaceful and serene. Wisps of luminescent mist rise from the water's surface, and you can hear a faint, melodic humming that seems to emanate from the pool itself. This is a place of great power, you realize - perhaps one of the last sanctuaries of pure magic in this corrupted land.",
+            "village_changed": "As you return from the healing pool, an eerie silence greets you. The primitive village you once knew has been twisted beyond recognition. The huts stand abandoned, their doorways gaping like hollow eyes. Dark tendrils of corrupted energy pulse through the ground, converging on the village center where a massive stone platform has risen from the earth. The air crackles with malevolent power. Atop the platform stands Divine Heart - an ancient being of terrible beauty. Its crystalline form pulses with dark energy, and you realize with horror that it has been here all along, hidden beneath the village, feeding on the settlement's life force. The creature's eyes lock onto you, and a voice like grinding stone echoes in your mind: 'You have come far, mortal. But your journey ends here.'",
+            "alley": "You cautiously follow the creature into a dark, narrow alley between two primitive huts. The passage is barely wide enough for you to walk through comfortably. Shadows dance on the rough stone walls as flickering torchlight from the village barely penetrates this far. Ahead, you can hear the skittering sounds of the ground dwelling creature - a small but aggressive-looking beast with matted fur, glowing red eyes, and sharp claws that scrape against the stone. It turns to face you, growling low in its throat, clearly territorial and ready to defend its den. The air is thick with tension as you consider your next move.",
+            "armory": "You unlock the heavy iron door and step into a well-stocked armory that takes your breath away. Weapons of every type line the walls - swords, axes, spears, and bows, all crafted with impressive skill. Suits of leather and chain mail armor hang on wooden stands, and shields of various sizes are mounted above them. The air smells of oil and metal. In the back, you can hear the distant sound of a forge hammer, though no smith is visible. This is clearly a place of importance to the village - their defensive strength made manifest. And there, on a special pedestal in the center of the room, you spot an ornate key that must belong to the chief's house.",
+            "epilogue": "As the last fragments of Divine Heart's crystalline form fade into nothingness, the dark energy dissipates like morning fog under the sun. The corrupted tendrils retreat into the earth, and the oppressive atmosphere lifts. You hear distant voices - the villagers are returning! They emerge from their hiding places in the surrounding forest, their faces filled with wonder and gratitude. The chief approaches you, tears streaming down weathered cheeks. 'You have saved us all,' the elder says, placing a hand on your shoulder. 'The ancient evil that slumbered beneath our village has been vanquished. You will be remembered in our songs and stories for generations to come.' As the sun breaks through the clouds for the first time in days, you realize your journey through the dark caves has led you not just to victory, but to becoming a legend. The village celebrates around you, and you know that while this adventure has ended, your story as a hero has only just begun."
+        }
+        
+        # Initialize consequences - will be populated in __init__
+        self.consequences = {}
+        self._initialize_consequences()
+        self.game_progress = {
+            'visited_village': False,
+            'defeated_guardian': False,
+            'found_treasure': False,
+            'met_chief': False,
+            'looked_around_dark': False,
+            'sat_and_cried': False,
+            'entered_skull_chamber': False,
+            'gained_villagers_trust': False,
+            'learned_ancient_secrets': False,
+            'entered_cautiously': False,
+            'confronted_darkness': False,
+            'learned_village_history': False,
+            'found_artifacts': False,
+            'helped_villagers': False,
+            'offered_services': False,
+            'gained_magical_insight': False,
+            'understood_pool_magic': False,
+            'restored_health': False,
+            'learned_village_customs': False,
+            'protected_villagers': False,
+            'gained_spiritual_insight': False,
+            'found_corruption_source': False,
+            'explored_alley': False,
+            'found_alley_treasure': False,
+            'investigated_alley_sounds': False,
+            'examined_armory': False,
+            'requested_custom_equipment': False,
+            'learned_weapon_maintenance': False
+        }
+        
+        # Asset caches
+        self.sprite_cache = {}
+        self.background_cache = {}
+        
+        # Scene progression
+        self.scene_progression = [
+            "cave_entrance",
+            "skull_chamber", 
+            "primitive_village",
+            "chiefs_house",
+            "healing_pool",
+            "village_changed",
+            "alley",
+            "armory"
+        ]
+        
+        # Class definitions
+        self.classes = {
+            'warrior': {
+                'name': 'Warrior',
+                'health': 120,
+                'strength': 15,
+                'agility': 8,
+                'intelligence': 5,
+                'starting_weapon': 'Iron Sword',
+                'ability': 'Shield Block',
+                'description': 'A mighty warrior with high health and strength. Perfect for beginners.',
+                'combat_skills': {
+                    'basic_attack': {'name': 'Heavy Strike', 'damage_multiplier': 1.2, 'description': 'A powerful melee attack'},
+                    'defend': {'name': 'Shield Block', 'damage_reduction': 0.6, 'description': 'Raise shield to reduce incoming damage'},
+                    'run': {'name': 'Tactical Retreat', 'success_chance': 0.7, 'description': 'Retreat while maintaining defensive stance'}
+                }
+            },
+            'rogue': {
+                'name': 'Rogue',
+                'health': 80,
+                'strength': 8,
+                'agility': 15,
+                'intelligence': 8,
+                'starting_weapon': 'Daggers',
+                'ability': 'Stealth',
+                'description': 'A swift rogue with high agility and critical hit chance.',
+                'combat_skills': {
+                    'basic_attack': {'name': 'Quick Strike', 'damage_multiplier': 1.0, 'critical_chance': 0.3, 'description': 'A fast attack with high critical hit chance'},
+                    'defend': {'name': 'Dodge', 'damage_reduction': 0.4, 'description': 'Dodge to avoid most incoming damage'},
+                    'run': {'name': 'Flee', 'success_chance': 0.9, 'description': 'Quickly escape from combat'}
+                }
+            },
+            'mage': {
+                'name': 'Mage',
+                'health': 70,
+                'strength': 5,
+                'agility': 6,
+                'intelligence': 18,
+                'starting_weapon': 'Magic Staff',
+                'ability': 'Fireball',
+                'description': 'A powerful mage with high intelligence and magical abilities.',
+                'combat_skills': {
+                    'basic_attack': {'name': 'Magic Bolt', 'damage_multiplier': 1.1, 'description': 'A magical projectile attack'},
+                    'defend': {'name': 'Magic Barrier', 'damage_reduction': 0.5, 'description': 'Create a magical barrier to reduce damage'},
+                    'run': {'name': 'Teleport', 'success_chance': 0.8, 'description': 'Magically teleport away from combat'}
+                }
+            }
+        }
+        
+        # Weapons
+        self.weapons = {
+            'Iron Sword': {'damage': 12, 'type': 'melee', 'class': 'warrior'},
+            'Daggers': {'damage': 8, 'type': 'melee', 'class': 'rogue'},
+            'Magic Staff': {'damage': 10, 'type': 'magic', 'class': 'mage'},
+            'Battle Axe': {'damage': 15, 'type': 'melee', 'class': 'warrior'},
+            'Poison Dagger': {'damage': 6, 'type': 'melee', 'class': 'rogue'},
+            'Lightning Bolt': {'damage': 14, 'type': 'magic', 'class': 'mage'},
+            'Ancient Blade': {'damage': 18, 'type': 'melee', 'class': 'warrior'},
+            'Shadow Dagger': {'damage': 12, 'type': 'melee', 'class': 'rogue'},
+            'Crystal Staff': {'damage': 16, 'type': 'magic', 'class': 'mage'},
+            'Steel Greatsword': {'damage': 20, 'type': 'melee', 'class': 'warrior'},
+            'Venomous Blade': {'damage': 10, 'type': 'melee', 'class': 'rogue'},
+            'Arcane Orb': {'damage': 18, 'type': 'magic', 'class': 'mage'},
+            'Thunder Hammer': {'damage': 22, 'type': 'melee', 'class': 'warrior'},
+            'Silent Death': {'damage': 14, 'type': 'melee', 'class': 'rogue'},
+            'Ethereal Wand': {'damage': 20, 'type': 'magic', 'class': 'mage'}
+        }
+        
+        # Items and equipment
+        self.items = {
+            'Health Potion': {'type': 'consumable', 'effect': 'heal', 'value': 30, 'description': 'Restores 30 health points'},
+            'Mana Potion': {'type': 'consumable', 'effect': 'mana', 'value': 25, 'description': 'Restores 25 mana points'},
+            'Leather Armor': {'type': 'armor', 'effect': 'defense', 'value': 5, 'description': 'Light armor providing basic protection'},
+            'Chain Mail': {'type': 'armor', 'effect': 'defense', 'value': 10, 'description': 'Medium armor with good protection'},
+            'Plate Armor': {'type': 'armor', 'effect': 'defense', 'value': 15, 'description': 'Heavy armor with maximum protection'},
+            'Ring of Strength': {'type': 'accessory', 'effect': 'strength', 'value': 3, 'description': 'Increases strength by 3'},
+            'Ring of Agility': {'type': 'accessory', 'effect': 'agility', 'value': 3, 'description': 'Increases agility by 3'},
+            'Ring of Intelligence': {'type': 'accessory', 'effect': 'intelligence', 'value': 3, 'description': 'Increases intelligence by 3'},
+            'Amulet of Health': {'type': 'accessory', 'effect': 'health', 'value': 20, 'description': 'Increases maximum health by 20'},
+            'Boots of Speed': {'type': 'accessory', 'effect': 'agility', 'value': 2, 'description': 'Increases agility by 2'},
+            'Crystal of Power': {'type': 'accessory', 'effect': 'intelligence', 'value': 2, 'description': 'Increases intelligence by 2'}
+        }
+        
+        # Enhanced scene choices
+        self.scene_choices = {
+            "cave_entrance": [
+                {
+                    "text": "Look around",
+                    "description": "You squint into the darkness, but your eyes haven't adjusted yet. You can barely make out the rough stone walls around you.",
+                    "consequence": "looked_around_dark"
+                },
+                {
+                    "text": "Sit and cry",
+                    "description": "You sink to the ground and let out your frustration. The tears don't help your situation, but at least you feel a bit better.",
+                    "consequence": "sat_and_cried"
+                },
+                {
+                    "text": "Go towards the light at the crack",
+                    "description": "You notice a faint light coming from a narrow crack in the wall. Squeezing through, you find yourself in a chamber filled with ancient skulls.",
+                    "consequence": "entered_skull_chamber"
+                }
+            ],
+            "skull_chamber": [
+                {
+                    "text": "Look for an exit",
+                    "description": "You search the chamber walls for any way out.",
+                    "consequence": "no_exit_visible"
+                },
+                {
+                    "text": "Examine the large glowing skull",
+                    "description": "You approach the mysterious glowing skull in the center of the chamber.",
+                    "consequence": "tunnel_collapse"
+                }
+            ],
+            "primitive_village": [
+                {
+                    "text": "Follow the creature into the alley",
+                    "description": "You decide to investigate the mysterious ground dwelling creature that scurried into the alley.",
+                    "consequence": "followed_creature_to_alley"
+                },
+                {
+                    "text": "Approach the armory",
+                    "description": "You head towards the armory building to see what weapons and equipment are available.",
+                    "consequence": "approached_armory"
+                },
+                {
+                    "text": "Approach the chief's house",
+                    "description": "You decide to find and speak with the village chief.",
+                    "consequence": "approached_chiefs_house"
+                }
+            ],
+            "chiefs_house": [
+                {
+                    "text": "Use the chief's house key",
+                    "description": "You attempt to use the chief's house key to enter the building.",
+                    "consequence": "used_chiefs_house_key"
+                },
+                {
+                    "text": "Return to the primitive village",
+                    "description": "You decide to leave the chief's house and return to the village.",
+                    "consequence": "returned_to_village"
+                }
+            ],
+            "healing_pool": [
+                {
+                    "text": "Drink from the healing waters",
+                    "description": "You carefully drink from the mystical pool to restore your health.",
+                    "consequence": "restored_health"
+                },
+                {
+                    "text": "Meditate by the pool",
+                    "description": "You sit quietly and absorb the magical energy of the healing pool.",
+                    "consequence": "gained_magical_insight"
+                },
+                {
+                    "text": "Return to the village",
+                    "description": "You decide to head back to the village to see what has changed.",
+                    "consequence": "advanced_to_village_changed"
+                }
+            ],
+            "village_changed": [
+                {
+                    "text": "Confront the dark presence",
+                    "description": "You face the corruption head-on with your abilities.",
+                    "consequence": "confronted_darkness"
+                },
+                {
+                    "text": "Help the remaining villagers",
+                    "description": "You focus on protecting and aiding the innocent villagers.",
+                    "consequence": "protected_villagers"
+                },
+                {
+                    "text": "Seek the source of corruption",
+                    "description": "You investigate to find the root cause of the village's transformation.",
+                    "consequence": "found_corruption_source"
+                }
+            ],
+            "alley": [
+                {
+                    "text": "Confront the creature",
+                    "description": "You decide to face the ground dwelling creature head-on.",
+                    "consequence": "confronted_alley_creature"
+                },
+                {
+                    "text": "Sneak past the creature",
+                    "description": "You try to quietly move past the creature without being noticed.",
+                    "consequence": "sneaked_past_creature"
+                },
+                {
+                    "text": "Search for items in the alley",
+                    "description": "You look for anything of value while avoiding the creature.",
+                    "consequence": "searched_alley_items"
+                }
+            ],
+            "armory": [
+                {
+                    "text": "Use the armory key",
+                    "description": "You attempt to use the armory key to access the armory's contents.",
+                    "consequence": "used_armory_key"
+                },
+                {
+                    "text": "Return to the primitive village",
+                    "description": "You decide to leave the armory and return to the village.",
+                    "consequence": "returned_to_village"
+                }
+            ],
+            "cave_in": [
+                {
+                    "text": "RUN",
+                    "description": "You desperately try to escape the collapsing tunnel.",
+                    "consequence": "escaped_cave_in"
+                }
+            ],
+            "epilogue": [
+                {
+                    "text": "Celebrate with the villagers",
+                    "description": "Join the celebration and accept the village's gratitude.",
+                    "consequence": "celebrated_victory"
+                },
+                {
+                    "text": "Reflect on your journey",
+                    "description": "Take a moment to think about everything you've experienced.",
+                    "consequence": "reflected_on_journey"
+                },
+                {
+                    "text": "End your adventure",
+                    "description": "Your quest is complete. Time to rest.",
+                    "consequence": "end_game"
+                }
+            ]
+        }
+        
+        # Initialize
+        self.load_assets()
+        self.show_class_selection()
+        
+    def show_class_selection(self):
+        """Show the class selection screen"""
+        # Clear the window
+        for widget in self.root.winfo_children():
+            widget.destroy()
+            
+        # Main container
+        main_frame = tk.Frame(self.root, bg='#0a0a0a')
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        
+        # Title
+        title = tk.Label(main_frame, text="SHABUYA CAVE ADVENTURE", 
+                         font=('Arial', 24, 'bold'), fg='#00ff88', bg='#0a0a0a')
+        title.pack(pady=20)
+        
+        subtitle = tk.Label(main_frame, text="Choose Your Class", 
+                           font=('Arial', 16), fg='#cccccc', bg='#0a0a0a')
+        subtitle.pack(pady=10)
+        
+        # Class selection frame
+        class_frame = tk.Frame(main_frame, bg='#0a0a0a')
+        class_frame.pack(pady=30)
+        
+        # Create class buttons
+        for i, (class_key, class_data) in enumerate(self.classes.items()):
+            class_btn_frame = tk.LabelFrame(class_frame, text=class_data['name'], 
+                                           fg='#ffcc88', bg='#1a1a1a', font=('Arial', 12, 'bold'))
+            class_btn_frame.pack(side=tk.LEFT, padx=10, pady=10)
+            
+            # Class description
+            desc = tk.Label(class_btn_frame, text=class_data['description'], 
+                           fg='#cccccc', bg='#1a1a1a', font=('Arial', 10), 
+                           wraplength=200, justify=tk.LEFT)
+            desc.pack(padx=15, pady=10)
+            
+            # Stats
+            stats_text = f"Health: {class_data['health']}\n"
+            stats_text += f"Strength: {class_data['strength']}\n"
+            stats_text += f"Agility: {class_data['agility']}\n"
+            stats_text += f"Intelligence: {class_data['intelligence']}\n"
+            stats_text += f"Weapon: {class_data['starting_weapon']}\n"
+            stats_text += f"Ability: {class_data['ability']}"
+            
+            stats = tk.Label(class_btn_frame, text=stats_text, 
+                            fg='#88ccff', bg='#1a1a1a', font=('Arial', 9), 
+                            justify=tk.LEFT)
+            stats.pack(padx=15, pady=10)
+            
+            # Select button
+            select_btn = tk.Button(class_btn_frame, text=f"Choose {class_data['name']}", 
+                                  command=lambda c=class_key: self.select_class(c),
+                                  bg='#44ff44', fg='black', font=('Arial', 11, 'bold'),
+                                  width=15, height=2)
+            select_btn.pack(pady=15)
+        
+    def select_class(self, class_key):
+        """Select a character class and start the game"""
+        self.player_character = class_key
+        class_data = self.classes[class_key]
+        
+        # Set initial stats
+        self.player_health = class_data['health']
+        self.player_strength = class_data['strength']
+        self.player_agility = class_data['agility']
+        self.player_intelligence = class_data['intelligence']
+        self.player_weapon = class_data['starting_weapon']
+        self.player_ability = class_data['ability']
+        
+        # Add starting weapon to inventory and equip it
+        self.inventory.append(self.player_weapon)
+        self.equipped_weapon = self.player_weapon
+        
+        # Add some starting items
+        self.inventory.extend(['Health Potion', 'Leather Armor'])
+        
+        # Start the game
+        self.create_ui()
+        self.start_new_game()
+        
+    def create_ui(self):
+        """Create the player-focused user interface"""
+        # Clear the window
+        for widget in self.root.winfo_children():
+            widget.destroy()
+            
+        # Main container
+        main_container = tk.Frame(self.root, bg='#0a0a0a')
+        main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Game canvas
+        canvas_frame = tk.Frame(main_container, bg='#1a1a1a', relief=tk.RAISED, bd=2)
+        canvas_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
+        
+        canvas_title = tk.Label(canvas_frame, text="SHABUYA CAVE ADVENTURE", 
+                               font=('Arial', 16, 'bold'), fg='#00ff88', bg='#1a1a1a')
+        canvas_title.pack(pady=10)
+        
+        # Scene Description Header
+        desc_frame = tk.LabelFrame(canvas_frame, text="Scene Description", 
+                                   fg='#ffcc88', bg='#1a1a1a', font=('Arial', 11, 'bold'))
+        desc_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        
+        self.scene_desc_text = tk.Text(desc_frame, height=4, bg='#0a0a0a', fg='#cccccc',
+                                      font=('Arial', 10), wrap=tk.WORD, relief=tk.FLAT)
+        self.scene_desc_text.pack(fill=tk.X, padx=8, pady=8)
+        
+        self.canvas = tk.Canvas(canvas_frame, width=900, height=380, bg='black')
+        self.canvas.pack(padx=10, pady=(0, 10))
+        self.canvas.pack_propagate(False)  # Prevent canvas from shrinking
+        
+        # Story/Choices footer
+        story_frame = tk.LabelFrame(canvas_frame, text="Current Situation & Choices", 
+                                   fg='#88ccff', bg='#1a1a1a', font=('Arial', 11, 'bold'))
+        story_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        
+        self.story_text = tk.Text(story_frame, height=5, bg='#0a0a0a', fg='#cccccc',
+                                 font=('Arial', 9), wrap=tk.WORD, relief=tk.FLAT)
+        self.story_text.pack(fill=tk.X, padx=8, pady=8)
+        
+        # Choice input
+        choice_frame = tk.Frame(canvas_frame, bg='#1a1a1a')
+        choice_frame.pack(fill=tk.X, padx=10, pady=(0, 5))
+        
+        choice_label = tk.Label(choice_frame, text="Enter choice (1-3):", 
+                               fg='#88ccff', bg='#1a1a1a', font=('Arial', 10))
+        choice_label.pack(side=tk.LEFT)
+        
+        self.choice_entry = tk.Entry(choice_frame, width=5, bg='#0a0a0a', fg='#cccccc',
+                                     font=('Arial', 10))
+        self.choice_entry.pack(side=tk.RIGHT, padx=(5, 0))
+        self.choice_entry.bind('<Return>', self.handle_choice_input)
+        
+        # Control panel
+        control_frame = tk.Frame(main_container, bg='#2a2a2a', width=280)
+        control_frame.pack(side=tk.RIGHT, fill=tk.Y)
+        control_frame.pack_propagate(False)
+        
+        control_title = tk.Label(control_frame, text="GAME CONTROLS", 
+                                font=('Arial', 14, 'bold'), fg='#ffffff', bg='#2a2a2a')
+        control_title.pack(pady=15)
+        
+        # Action buttons
+        action_frame = tk.LabelFrame(control_frame, text="Actions", 
+                                    fg='#88ccff', bg='#2a2a2a', font=('Arial', 11, 'bold'))
+        action_frame.pack(fill=tk.X, padx=15, pady=10)
+        
+        self.inventory_btn = tk.Button(action_frame, text="Inventory/Stats", 
+                                     command=self.show_inventory_stats,
+                                     bg='#cc8844', fg='white', font=('Arial', 10, 'bold'))
+        self.inventory_btn.pack(fill=tk.X, padx=8, pady=4)
+        
+        # Character info
+        char_frame = tk.LabelFrame(control_frame, text="Character", 
+                                  fg='#ffcc88', bg='#2a2a2a', font=('Arial', 11, 'bold'))
+        char_frame.pack(fill=tk.X, padx=15, pady=10)
+        
+        self.health_label = tk.Label(char_frame, text="Health: 100", 
+                                    fg='#ff4444', bg='#2a2a2a', font=('Arial', 10))
+        self.health_label.pack(pady=2)
+        
+        self.level_label = tk.Label(char_frame, text="Level: 1", 
+                                   fg='#44ff44', bg='#2a2a2a', font=('Arial', 10))
+        self.level_label.pack(pady=2)
+        
+        self.exp_label = tk.Label(char_frame, text="Experience: 0", 
+                                 fg='#4444ff', bg='#2a2a2a', font=('Arial', 10))
+        self.exp_label.pack(pady=2)
+        
+        self.weapon_label = tk.Label(char_frame, text="Weapon: Iron Sword", 
+                                    fg='#ff8844', bg='#2a2a2a', font=('Arial', 10))
+        self.weapon_label.pack(pady=2)
+        
+        # Game info
+        info_frame = tk.LabelFrame(control_frame, text="Game Info", 
+                                  fg='#cccccc', bg='#2a2a2a', font=('Arial', 11, 'bold'))
+        info_frame.pack(fill=tk.X, padx=15, pady=10)
+        
+        self.scene_label = tk.Label(info_frame, text="Scene: Cave Entrance", 
+                                   fg='#88ccff', bg='#2a2a2a', font=('Arial', 10))
+        self.scene_label.pack(pady=2)
+        
+        self.state_label = tk.Label(info_frame, text="State: Exploring", 
+                                   fg='#ff8888', bg='#2a2a2a', font=('Arial', 10))
+        self.state_label.pack(pady=2)
+        
+        # Menu buttons (removed save/load for MVP - will add when implemented)
+        
+    def load_assets(self):
+        """Load all sprites and backgrounds"""
+        print("Loading game assets...")
+        
+        # Load sprites with transparency
+        if os.path.exists(self.sprites_dir):
+            for filename in os.listdir(self.sprites_dir):
+                if filename.endswith('.png'):
+                    try:
+                        filepath = os.path.join(self.sprites_dir, filename)
+                        image = Image.open(filepath).convert("RGBA")
+                        
+                        # Remove background by making it transparent
+                        # This removes white/light backgrounds common in sprite images
+                        datas = image.getdata()
+                        newData = []
+                        
+                        # Transparency threshold (adjust if needed: 220-250 recommended)
+                        # Higher = only removes very light colors (conservative)
+                        # Lower = removes more background but may affect sprite details
+                        TRANSPARENCY_THRESHOLD = 240
+                        
+                        for item in datas:
+                            # Change all white/near-white (background) pixels to transparent
+                            if (item[0] > TRANSPARENCY_THRESHOLD and 
+                                item[1] > TRANSPARENCY_THRESHOLD and 
+                                item[2] > TRANSPARENCY_THRESHOLD):
+                                newData.append((255, 255, 255, 0))  # Transparent
+                            else:
+                                newData.append(item)  # Keep sprite pixels
+                        
+                        image.putdata(newData)
+                        image = image.resize((150, 150), Image.Resampling.LANCZOS)
+                        self.sprite_cache[filename] = ImageTk.PhotoImage(image)
+                    except Exception as e:
+                        print(f"Failed to load sprite {filename}: {e}")
+        
+        # Load backgrounds
+        if os.path.exists(self.backgrounds_dir):
+            for filename in os.listdir(self.backgrounds_dir):
+                if filename.endswith('.png'):
+                    try:
+                        filepath = os.path.join(self.backgrounds_dir, filename)
+                        image = Image.open(filepath)
+                        image = image.resize((900, 380), Image.Resampling.LANCZOS)
+                        self.background_cache[filename] = ImageTk.PhotoImage(image)
+                    except Exception as e:
+                        print(f"Failed to load background {filename}: {e}")
+        
+        print(f"Assets loaded: {len(self.sprite_cache)} sprites, {len(self.background_cache)} backgrounds")
+    
+    def _initialize_consequences(self):
+        """Initialize all game consequences in a centralized location"""
+        self.consequences = {
+            'looked_around_dark': {
+                'text': 'You strain your eyes in the darkness. As they adjust, you can make out rough stone walls and the faint outline of the cave opening. Your observation skills sharpen.',
+                'effect': lambda: self.gain_experience(5)
+            },
+            'sat_and_cried': {
+                'text': 'You sink to the ground and let the frustration out. The tears flow freely, and oddly, you feel a bit better afterward - more centered and ready to face whatever comes next.',
+                'effect': lambda: self.gain_experience(5)
+            },
+            'entered_skull_chamber': {
+                'text': 'You entered the skull chamber.',
+                'effect': lambda: self.advance_to_skull_chamber()
+            },
+            'no_exit_visible': {
+                'text': 'You search the chamber walls carefully, running your hands along the cold stone. No obvious exits present themselves, but you notice strange markings on some of the skulls - perhaps ancient warnings. Your thoroughness is commendable.',
+                'effect': lambda: self.gain_experience(5)
+            },
+            'tunnel_collapse': {
+                'text': 'The tunnel starts to collapse!!',
+                'effect': lambda: self.trigger_cave_in()
+            },
+            'gained_villagers_trust': {
+                'text': 'The villagers welcome you warmly.',
+                'effect': lambda: self.gain_experience(10)
+            },
+            'learned_village_customs': {
+                'text': 'You learn about the village customs.',
+                'effect': lambda: self.gain_experience(5)
+            },
+            'met_chief': {
+                'text': 'The chief greets you with respect.',
+                'effect': lambda: self.gain_experience(15)
+            },
+            'offered_services': {
+                'text': 'You offer your services to the village.',
+                'effect': lambda: self.gain_experience(10)
+            },
+            'advanced_to_healing_pool': {
+                'text': 'You make your way to the healing pool.',
+                'effect': lambda: self.advance_to_scene('healing_pool')
+            },
+            'restored_health': {
+                'text': 'The healing waters restore your health.',
+                'effect': lambda: self.restore_health(50)
+            },
+            'gained_magical_insight': {
+                'text': 'You gain magical insight from the pool.',
+                'effect': lambda: self.gain_experience(20)
+            },
+            'understood_pool_magic': {
+                'text': 'You understand the pool\'s magical properties.',
+                'effect': lambda: self.gain_experience(15)
+            },
+            'learned_ancient_secrets': {
+                'text': 'You learn ancient secrets from the chief.',
+                'effect': lambda: self.gain_experience(25)
+            },
+            'entered_cautiously': {
+                'text': 'You enter the chamber cautiously.',
+                'effect': lambda: self.gain_experience(5)
+            },
+            'confronted_darkness': {
+                'text': 'You face the dark presence with courage and determination. Divine Heart emerges from the corrupted village center, its crystalline form radiating malevolent power. The final battle begins!',
+                'effect': lambda: self.start_boss_combat()
+            },
+            'learned_village_history': {
+                'text': 'You learn about the village\'s history.',
+                'effect': lambda: self.gain_experience(10)
+            },
+            'found_artifacts': {
+                'text': 'You discover ancient artifacts.',
+                'effect': lambda: self.gain_experience(15)
+            },
+            'helped_villagers': {
+                'text': 'You help the villagers with their tasks.',
+                'effect': lambda: self.gain_experience(10)
+            },
+            'examined_armory': {
+                'text': 'You examine the weapons and armor in detail.',
+                'effect': lambda: self.gain_experience(10)
+            },
+            'requested_custom_equipment': {
+                'text': 'You request custom equipment from the armorer.',
+                'effect': lambda: self.gain_experience(5)
+            },
+            'learned_weapon_maintenance': {
+                'text': 'You learn valuable techniques for maintaining your weapons.',
+                'effect': lambda: self.gain_experience(15)
+            },
+            'advanced_to_village': {
+                'text': 'You venture deeper into the cave system and emerge into a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.',
+                'effect': lambda: self.advance_to_scene('primitive_village')
+            },
+            'advanced_to_chiefs_house': {
+                'text': 'You make your way to the chief\'s house, the largest building in the village.',
+                'effect': lambda: self.advance_to_scene('chiefs_house')
+            },
+            'advanced_to_village_changed': {
+                'text': 'You return to the village, but something has changed dramatically.',
+                'effect': lambda: self.advance_to_scene('village_changed')
+            },
+            'escaped_cave_in': {
+                'text': 'You manage to escape the collapsing tunnel and find yourself in a primitive village nestled in a hidden valley. Crude huts made of stone and thatch dot the landscape, with smoke curling from cooking fires. The inhabitants, dressed in simple animal skins, eye you warily as you approach. Their faces show a mix of curiosity and suspicion. As you take in your surroundings, you notice a ground dwelling creature scurries into the alley between two huts, its movements quick and furtive.',
+                'effect': lambda: self.advance_to_scene('primitive_village')
+            },
+            'followed_creature_to_alley': {
+                'text': 'You cautiously follow the creature into the dark alley. The narrow passage is filled with shadows and strange sounds. You can hear the creature moving ahead of you, its footsteps echoing off the stone walls.',
+                'effect': lambda: self.advance_to_scene('alley')
+            },
+            'approached_armory': {
+                'text': 'You approach the armory building. The door is locked with a heavy iron lock. You need a key to enter this building.',
+                'effect': lambda: self.check_armory_access()
+            },
+            'approached_chiefs_house': {
+                'text': 'You approach the chief\'s house. The door is locked with an ornate tribal lock. You need a special key to enter this building.',
+                'effect': lambda: self.check_chiefs_house_access()
+            },
+            'confronted_alley_creature': {
+                'text': 'You confront the ground dwelling creature! It\'s a small but aggressive beast with sharp claws. Combat begins!',
+                'effect': lambda: self.start_alley_combat()
+            },
+            'sneaked_past_creature': {
+                'text': 'You successfully sneak past the creature without being noticed. You find a hidden alcove with some useful items.',
+                'effect': lambda: self.sneak_past_creature()
+            },
+            'searched_alley_items': {
+                'text': 'You carefully search the alley while staying hidden. You find some scattered coins and a rusty dagger.',
+                'effect': lambda: self.search_alley_items()
+            },
+            'searched_armory_keys': {
+                'text': 'You search through the armory and find a special key hidden in a locked drawer. It appears to be for the chief\'s house.',
+                'effect': lambda: self.find_chiefs_house_key()
+            },
+            'used_armory_key': {
+                'text': 'You use the armory key to unlock the armory\'s storage. Inside you find weapons, armor, and a special key for the chief\'s house.',
+                'effect': lambda: self.access_armory_contents()
+            },
+            'used_chiefs_house_key': {
+                'text': 'You use the chief\'s house key to unlock the ornate door. The chief welcomes you inside and offers guidance.',
+                'effect': lambda: self.access_chiefs_house()
+            },
+            'returned_to_village': {
+                'text': 'You return to the primitive village. The villagers continue their daily activities around you.',
+                'effect': lambda: self.advance_to_scene('primitive_village')
+            },
+            'protected_villagers': {
+                'text': 'You rush to help the remaining villagers, defending them from the dark forces. They flee to safety as you stand between them and the corruption. Divine Heart rises from the village center, recognizing you as a true threat.',
+                'effect': lambda: self.start_boss_combat()
+            },
+            'found_corruption_source': {
+                'text': 'You investigate the village, following the dark energy to its source. In the village center, you discover the truth - Divine Heart has been hiding here all along, feeding on the village. The ancient being emerges to confront you directly.',
+                'effect': lambda: self.start_boss_combat()
+            },
+            'celebrated_victory': {
+                'text': 'You join the villagers in celebration. They prepare a feast in your honor, and the chief presents you with a ceremonial medallion marking you as a guardian of the village. Children ask to hear tales of your battle, and you spend the evening recounting your adventures. As night falls, you feel a deep sense of accomplishment and belonging.',
+                'effect': lambda: self.gain_experience(25)
+            },
+            'reflected_on_journey': {
+                'text': 'You find a quiet spot overlooking the village and reflect on your incredible journey. From waking up confused in a dark cave to defeating an ancient evil, you\'ve grown stronger and wiser. The Divine Heart Crystal pulses gently in your hand, a reminder of the darkness you\'ve overcome and the light you\'ve brought back to this hidden valley.',
+                'effect': lambda: self.gain_experience(25)
+            },
+            'end_game': {
+                'text': 'Your adventure in SHABUYA Cave has come to an end. You have proven yourself a true hero, saved an entire village, and uncovered ancient secrets. The villagers will sing songs of your bravery for generations. Thank you for playing!',
+                'effect': lambda: self.show_end_game_screen()
+            }
+        }
+        
+    def start_new_game(self):
+        """Start a new game"""
+        self.current_scene = "cave_entrance"
+        self.game_state = "exploring"
+        self.visited_scenes = ["cave_entrance"]
+        self.game_progress = {
+            'visited_village': False,
+            'defeated_guardian': False,
+            'found_treasure': False,
+            'met_chief': False,
+            'looked_around_dark': False,
+            'sat_and_cried': False,
+            'entered_skull_chamber': False,
+            'gained_villagers_trust': False,
+            'learned_ancient_secrets': False,
+            'entered_cautiously': False,
+            'confronted_darkness': False,
+            'learned_village_history': False,
+            'found_artifacts': False,
+            'helped_villagers': False,
+            'offered_services': False,
+            'gained_magical_insight': False,
+            'understood_pool_magic': False,
+            'restored_health': False,
+            'learned_village_customs': False,
+            'protected_villagers': False,
+            'gained_spiritual_insight': False,
+            'found_corruption_source': False,
+            'explored_alley': False,
+            'found_alley_treasure': False,
+            'investigated_alley_sounds': False,
+            'examined_armory': False,
+            'requested_custom_equipment': False,
+            'learned_weapon_maintenance': False
+        }
+        
+        self.update_display()
+        class_name = self.classes[self.player_character]['name']
+        self.add_story_text_top(f"Welcome to SHABUYA Cave Adventure! You are a {class_name} standing at the entrance to mysterious caves. What will you discover within?")
+        
+        # Show initial scene description and choices automatically
+        self.show_scene_description()
+        
+    def show_scene_description(self):
+        """Show the current scene description and choices automatically"""
+        # Clear both text areas
+        self.clear_story_text()
+        self.scene_desc_text.config(state='normal')  # Enable editing
+        self.scene_desc_text.delete('1.0', tk.END)
+        
+        # Show scene description in header
+        scene_desc = self.scene_descriptions.get(self.current_scene, "You examine your surroundings carefully.")
+        self.scene_desc_text.insert('1.0', scene_desc)
+        self.scene_desc_text.config(state='disabled')  # Make read-only
+        
+        # Show choices in footer (compact format for readability)
+        if self.current_scene in self.scene_choices:
+            choices = self.scene_choices[self.current_scene]
+            for i, choice in enumerate(choices):
+                choice_text = f"{i+1}. {choice['text']}"
+                self.add_story_text_compact(choice_text)
+        else:
+            self.add_story_text_compact("No choices available for this scene.")
+        
+    def update_display(self):
+        """Update the main display"""
+        self.canvas.delete("all")
+        
+        # Draw background
+        bg_file = f"{self.current_scene}.png"
+        if bg_file in self.background_cache:
+            bg_image = self.background_cache[bg_file]
+            self.canvas.create_image(450, 190, image=bg_image)
+        else:
+            self.canvas.create_rectangle(0, 0, 900, 380, fill='#1a1a2e')
+            self.canvas.create_text(450, 190, text=f"{self.current_scene.upper()}", 
+                                   fill='#4a4a6a', font=('Arial', 32))
+        
+        # Draw player sprite
+        player_sprite = f"{self.player_character}_sprite.png"
+        if player_sprite in self.sprite_cache:
+            sprite_image = self.sprite_cache[player_sprite]
+            x, y = 300, 300
+            self.canvas.create_image(x, y, image=sprite_image)
+        
+        # Draw enemy if in combat
+        if self.game_state == "in_combat":
+            # Select correct enemy sprite based on current enemy
+            enemy_sprite_map = {
+                "Divine Heart": "boss_divineheart_sprite.png",
+                "Ground Dwelling Creature": "ground creature_sprite.png",
+                "Cave Guardian": "cave_guardian_sprite.png",
+                "Primitive Creature": "primitive_creature_sprite.png"
+            }
+            
+            enemy_sprite = enemy_sprite_map.get(self.combat_enemy, "ground creature_sprite.png")
+            if enemy_sprite in self.sprite_cache:
+                enemy_image = self.sprite_cache[enemy_sprite]
+                self.canvas.create_image(600, 300, image=enemy_image)
+            else:
+                # Fallback to first available sprite
+                for enemy_file in enemy_sprite_map.values():
+                    if enemy_file in self.sprite_cache:
+                        enemy_image = self.sprite_cache[enemy_file]
+                        self.canvas.create_image(600, 300, image=enemy_image)
+                        break
+        
+        # Update UI labels
+        self.health_label.config(text=f"Health: {self.player_health}")
+        self.level_label.config(text=f"Level: {self.player_level}")
+        self.exp_label.config(text=f"Experience: {self.player_experience}")
+        self.weapon_label.config(text=f"Weapon: {self.player_weapon}")
+        self.scene_label.config(text=f"Scene: {self.current_scene.replace('_', ' ').title()}")
+        self.state_label.config(text=f"State: {self.game_state.title()}")
+        
+    def show_inventory_stats(self):
+        """Show inventory and stats window"""
+        # Create inventory window
+        inv_window = tk.Toplevel(self.root)
+        inv_window.title("Inventory & Stats")
+        inv_window.geometry("600x500")
+        inv_window.configure(bg='#1a1a1a')
+        inv_window.transient(self.root)
+        inv_window.grab_set()
+        
+        # Title
+        title = tk.Label(inv_window, text="Inventory & Character Stats", 
+                        font=('Arial', 16, 'bold'), fg='#00ff88', bg='#1a1a1a')
+        title.pack(pady=15)
+        
+        # Create notebook for tabs
+        notebook = ttk.Notebook(inv_window)
+        notebook.pack(fill=tk.BOTH, expand=True, padx=15, pady=10)
+        
+        # Stats tab
+        stats_frame = tk.Frame(notebook, bg='#2a2a2a')
+        notebook.add(stats_frame, text="Stats")
+        
+        # Character stats
+        stats_text = f"Class: {self.classes[self.player_character]['name']}\n"
+        stats_text += f"Level: {self.player_level}\n"
+        stats_text += f"Health: {self.player_health}/{self.classes[self.player_character]['health']}\n"
+        stats_text += f"Experience: {self.player_experience}/100\n"
+        stats_text += f"Strength: {self.player_strength}\n"
+        stats_text += f"Agility: {self.player_agility}\n"
+        stats_text += f"Intelligence: {self.player_intelligence}\n"
+        stats_text += f"Ability: {self.player_ability}\n"
+        stats_text += f"Equipped Weapon: {self.equipped_weapon}\n"
+        stats_text += f"Equipped Armor: {self.equipped_armor or 'None'}\n"
+        stats_text += f"Accessories: {', '.join(self.equipped_accessories) if self.equipped_accessories else 'None'}"
+        
+        stats_label = tk.Label(stats_frame, text=stats_text, 
+                              fg='#cccccc', bg='#2a2a2a', font=('Arial', 12), 
+                              justify=tk.LEFT)
+        stats_label.pack(pady=20)
+        
+        # Inventory tab
+        inv_frame = tk.Frame(notebook, bg='#2a2a2a')
+        notebook.add(inv_frame, text="Inventory")
+        
+        # Inventory list
+        inv_text = "Inventory Items:\n\n"
+        for item in self.inventory:
+            if item in self.weapons:
+                item_info = f"⚔️ {item} (Weapon - {self.weapons[item]['damage']} damage)"
+            elif item in self.items:
+                item_info = f"📦 {item} - {self.items[item]['description']}"
+            else:
+                item_info = f"❓ {item}"
+            inv_text += item_info + "\n\n"
+        
+        inv_label = tk.Label(inv_frame, text=inv_text, 
+                            fg='#cccccc', bg='#2a2a2a', font=('Arial', 10), 
+                            justify=tk.LEFT, wraplength=500)
+        inv_label.pack(pady=20)
+        
+        # Equipment tab
+        equip_frame = tk.Frame(notebook, bg='#2a2a2a')
+        notebook.add(equip_frame, text="Equipment")
+        
+        # Equipment management
+        equip_text = "Current Equipment:\n\n"
+        equip_text += f"Weapon: {self.equipped_weapon or 'None'}\n"
+        equip_text += f"Armor: {self.equipped_armor or 'None'}\n"
+        equip_text += f"Accessories: {', '.join(self.equipped_accessories) if self.equipped_accessories else 'None'}\n\n"
+        equip_text += "Available Equipment:\n\n"
+        
+        for item in self.inventory:
+            if item in self.weapons:
+                equip_text += f"⚔️ {item} (Weapon)\n"
+            elif item in self.items and self.items[item]['type'] in ['armor', 'accessory']:
+                equip_text += f"🛡️ {item} ({self.items[item]['type'].title()})\n"
+        
+        equip_label = tk.Label(equip_frame, text=equip_text, 
+                              fg='#cccccc', bg='#2a2a2a', font=('Arial', 10), 
+                              justify=tk.LEFT, wraplength=500)
+        equip_label.pack(pady=20)
+        
+        # Close button
+        close_btn = tk.Button(inv_window, text="Close", 
+                             command=inv_window.destroy,
+                             bg='#44aa44', fg='white', font=('Arial', 12, 'bold'))
+        close_btn.pack(pady=15)
+        
+    def go_back_scene(self):
+        """Go back to the previous scene"""
+        if len(self.visited_scenes) > 1:
+            self.visited_scenes.pop()  # Remove current scene
+            self.current_scene = self.visited_scenes[-1]  # Get previous scene
+            self.game_state = "exploring"
+            self.add_story_text(f"You return to {self.current_scene.replace('_', ' ').title()}.")
+            self.update_display()
+            self.show_scene_description()
+        else:
+            self.add_story_text("You cannot go back further.")
+            
+    def execute_choice(self, choice, window):
+        """Execute the chosen action"""
+        if window:
+            window.destroy()
+        
+        # Handle consequences
+        consequence = choice['consequence']
+        self.handle_consequence(consequence)
+        
+        self.update_display()
+        
+    def handle_consequence(self, consequence):
+        """Handle the consequences of player choices"""
+        if consequence in self.consequences:
+            consequence_data = self.consequences[consequence]
+            self.add_story_text(consequence_data['text'])
+            consequence_data['effect']()
+            # Continuity validation
+            try:
+                from utilities.continuity_validator import ContinuityValidator
+                ok, message = ContinuityValidator.validate(self)
+                if not ok:
+                    # Revert to a safe state: return to primitive_village exploration
+                    self.add_story_text(message or "This action is not allowed right now.")
+                    self.current_scene = "primitive_village"
+                    self.game_state = "exploring"
+                    self.update_display()
+                    self.show_scene_description()
+                    return
+            except Exception as _e:
+                # Non-fatal: continue without blocking gameplay
+                pass
+        else:
+            # Add error handling for unknown consequences
+            self.add_story_text(f"Unknown consequence: {consequence}")
+            print(f"Warning: Unknown consequence '{consequence}' encountered")
+        
+        # Mark progress
+        self.game_progress[consequence] = True
+        
+    def gain_experience(self, amount):
+        """Gain experience points"""
+        self.experience += amount
+        self.add_story_text(f"You gained {amount} experience points!")
+        
+        # Check for level up
+        if self.experience >= self.level * 100:
+            self.level_up()
+    
+    def level_up(self):
+        """Handle level up"""
+        self.level += 1
+        self.experience = 0
+        self.max_health += 10
+        self.health = self.max_health
+        self.add_story_text(f"Level up! You are now level {self.level}!")
+        self.add_story_text("Your health has been restored and increased!")
+    
+    def gain_experience(self, amount):
+        """Gain experience points"""
+        self.player_experience += amount
+        self.add_story_text(f"You gain {amount} experience points!")
+        
+        if self.player_experience >= 100:
+            self.level_up()
+            
+    def restore_health(self, amount):
+        """Restore health"""
+        old_health = self.player_health
+        self.player_health = min(self.classes[self.player_character]['health'], 
+                                self.player_health + amount)
+        restored = self.player_health - old_health
+        self.add_story_text(f"Your health is restored by {restored} points!")
+        
+    def advance_to_skull_chamber(self):
+        """Advance directly to the skull chamber"""
+        self.current_scene = "skull_chamber"
+        self.visited_scenes.append("skull_chamber")
+        self.game_state = "exploring"
+        self.add_story_text_top("You find yourself in a chamber filled with ancient skulls.")
+        self.update_display()
+        self.show_scene_description()
+        
+    def advance_to_scene(self, scene_name):
+        """Advance to a specific scene with validation"""
+        if not scene_name:
+            self.add_story_text("Error: No scene name provided.")
+            return
+            
+        if scene_name not in self.scene_descriptions:
+            self.add_story_text(f"Error: Unknown scene '{scene_name}'.")
+            print(f"Warning: Attempted to advance to unknown scene '{scene_name}'")
+            return
+            
+        self.current_scene = scene_name
+        if scene_name not in self.visited_scenes:
+            self.visited_scenes.append(scene_name)
+        self.game_state = "exploring"
+        self.update_display()
+        self.show_scene_description()
+    
+    def check_armory_access(self):
+        """Check if player has armory key and advance to armory scene"""
+        if 'Armory Key' in self.inventory:
+            self.add_story_text("You approach the armory building. The door is locked, but you have the armory key.")
+            self.advance_to_scene('armory')
+        else:
+            self.add_story_text("You approach the armory building. The door is locked with a heavy iron lock. You need to find the armory key first. Perhaps it can be found by defeating the creature in the alley?")
+            # Stay in primitive village
+            self.current_scene = "primitive_village"
+            self.update_display()
+            self.show_scene_description()
+    
+    def check_chiefs_house_access(self):
+        """Check if player has chiefs house key and advance to chiefs house scene"""
+        if 'Chief\'s House Key' in self.inventory:
+            self.add_story_text("You approach the chief's house. The door is locked, but you have the chief's house key.")
+            self.advance_to_scene('chiefs_house')
+        else:
+            self.add_story_text("You approach the chief's house. The door is locked with an ornate tribal lock. You need to find the chief's house key first. Perhaps it can be found in the armory?")
+            # Stay in primitive village
+            self.current_scene = "primitive_village"
+            self.update_display()
+            self.show_scene_description()
+    
+    def start_alley_combat(self):
+        """Start combat with the alley creature"""
+        self.game_state = "in_combat"
+        self.combat_enemy = "Ground Dwelling Creature"
+        self.combat_enemy_health = 30
+        self.combat_turn = 0
+        
+        # Initialize available combat skills based on class
+        self.available_combat_skills = list(self.classes[self.player_character]['combat_skills'].keys())
+        
+        self.add_story_text("The ground dwelling creature attacks! Combat begins!")
+        self.add_story_text(f"Enemy: {self.combat_enemy} (Health: {self.combat_enemy_health})")
+        self.add_story_text("Choose your combat action:")
+        
+        # Show combat choices
+        self.show_combat_choices()
+        
+        self.update_display()
+    
+    def start_boss_combat(self):
+        """Start the final boss battle with Divine Heart"""
+        self.game_state = "in_combat"
+        self.combat_enemy = "Divine Heart"
+        self.combat_enemy_health = 150  # Much stronger than regular enemies
+        self.combat_turn = 0
+        
+        # Initialize available combat skills based on class
+        self.available_combat_skills = list(self.classes[self.player_character]['combat_skills'].keys())
+        
+        self.add_story_text("═══════════════════════════════════════")
+        self.add_story_text("    FINAL BATTLE: DIVINE HEART")
+        self.add_story_text("═══════════════════════════════════════")
+        self.add_story_text(f"The ancient being towers before you, its crystalline form pulsing with dark power!")
+        self.add_story_text(f"Enemy: {self.combat_enemy} (Health: {self.combat_enemy_health})")
+        self.add_story_text("This is the fight for the village's survival!")
+        self.add_story_text("")
+        self.add_story_text("Choose your combat action:")
+        
+        # Show combat choices
+        self.show_combat_choices()
+        
+        self.update_display()
+    
+    def show_combat_choices(self):
+        """Show combat choices based on available skills"""
+        self.clear_story_text()
+        
+        for i, skill_key in enumerate(self.available_combat_skills, 1):
+            skill = self.classes[self.player_character]['combat_skills'][skill_key]
+            self.add_story_text_compact(f"{i}. {skill['name']} - {skill['description']}")
+    
+    def handle_combat_action(self, choice):
+        """Handle combat action based on player choice with validation"""
+        if self.game_state != "in_combat":
+            self.add_story_text("You are not in combat!")
+            return
+            
+        if not self.available_combat_skills:
+            self.add_story_text("No combat skills available!")
+            return
+            
+        max_skills = len(self.available_combat_skills)
+        if choice < 1 or choice > max_skills:
+            self.add_story_text(f"Invalid choice! Please select 1-{max_skills}.")
+            return
+            
+        skill_key = self.available_combat_skills[choice - 1]
+        skill = self.classes[self.player_character]['combat_skills'][skill_key]
+        
+        self.add_story_text(f"You use {skill['name']}!")
+        
+        if skill_key == 'basic_attack':
+            self.perform_attack(skill)
+        elif skill_key == 'defend':
+            self.perform_defend(skill)
+        elif skill_key == 'run':
+            self.perform_run(skill)
+        
+        # Check if combat continues
+        if self.game_state == "in_combat" and self.combat_enemy_health > 0:
+            self.enemy_turn()
+    
+    def perform_attack(self, skill):
+        """Perform attack action"""
+        # Calculate damage
+        weapon_damage = self.weapons[self.player_weapon]['damage']
+        base_damage = weapon_damage * skill['damage_multiplier']
+        
+        # Add class bonuses
+        if self.player_character == 'warrior':
+            base_damage += self.player_strength * 0.5
+        elif self.player_character == 'rogue':
+            base_damage += self.player_agility * 0.3
+        elif self.player_character == 'mage':
+            base_damage += self.player_intelligence * 0.4
+        
+        # Check for critical hit (rogue only)
+        if 'critical_chance' in skill and random.random() < skill['critical_chance']:
+            base_damage *= 2
+            self.add_story_text("Critical hit!")
+        
+        damage = int(base_damage)
+        self.combat_enemy_health -= damage
+        
+        self.add_story_text(f"You deal {damage} damage to the {self.combat_enemy}!")
+        
+        if self.combat_enemy_health <= 0:
+            self.end_combat_victory()
+    
+    def perform_defend(self, skill):
+        """Perform defend action"""
+        self.add_story_text(f"You prepare to {skill['name'].lower()}!")
+        # Defense will be applied during enemy turn
+        self.defending = True
+        self.defense_reduction = skill['damage_reduction']
+    
+    def perform_run(self, skill):
+        """Perform run action"""
+        if random.random() < skill['success_chance']:
+            self.add_story_text(f"You successfully {skill['name'].lower()}!")
+            self.end_combat_escape()
+        else:
+            self.add_story_text(f"Your attempt to {skill['name'].lower()} fails!")
+    
+    def enemy_turn(self):
+        """Handle enemy turn"""
+        if self.combat_enemy_health <= 0:
+            return
+            
+        self.add_story_text(f"The {self.combat_enemy} attacks!")
+        
+        # Calculate enemy damage
+        enemy_damage = random.randint(8, 15)
+        
+        # Apply defense if player defended
+        if hasattr(self, 'defending') and self.defending:
+            enemy_damage = int(enemy_damage * (1 - self.defense_reduction))
+            self.add_story_text(f"Your defense reduces the damage!")
+            self.defending = False
+        
+        self.player_health = max(0, self.player_health - enemy_damage)
+        self.add_story_text(f"You take {enemy_damage} damage! Health: {self.player_health}")
+        
+        if self.player_health <= 0:
+            self.end_combat_defeat()
+        else:
+            self.add_story_text("Choose your next combat action:")
+            self.show_combat_choices()
+    
+    def end_combat_victory(self):
+        """End combat with victory"""
+        self.add_story_text(f"You defeat the {self.combat_enemy}!")
+        
+        # Different rewards for different enemies
+        if self.combat_enemy == "Ground Dwelling Creature":
+            self.add_story_text("The creature drops an armory key as it falls.")
+            self.inventory.append('Armory Key')
+            self.add_story_text("You pick up the armory key. This might be useful for accessing the armory building.")
+            self.gain_experience(15)
+        elif self.combat_enemy == "Divine Heart":
+            self.add_story_text("═══════════════════════════════════════")
+            self.add_story_text("         VICTORY!")
+            self.add_story_text("═══════════════════════════════════════")
+            self.add_story_text("The crystalline form of Divine Heart shatters into a thousand glowing fragments!")
+            self.add_story_text("The corruption dissipates from the village, and you hear the distant cheers of the villagers returning.")
+            self.add_story_text("You have saved the village and uncovered an ancient evil!")
+            self.inventory.append('Divine Heart Crystal')
+            self.add_story_text("You claim the Divine Heart Crystal as proof of your victory!")
+            self.gain_experience(100)
+            # Advance to epilogue after victory
+            self.current_scene = "epilogue"
+            self.visited_scenes.append("epilogue")
+        else:
+            self.gain_experience(15)
+        
+        self.game_state = "exploring"
+        self.update_display()
+        self.show_scene_description()
+    
+    def end_combat_escape(self):
+        """End combat with escape"""
+        self.add_story_text("You escape from combat!")
+        self.gain_experience(5)
+        
+        self.game_state = "exploring"
+        self.update_display()
+        self.show_scene_description()
+    
+    def end_combat_defeat(self):
+        """End combat with defeat"""
+        self.add_story_text("You are defeated! You retreat from combat.")
+        self.add_story_text("You lose some health and return to the village.")
+        
+        # Return to village with reduced health
+        self.current_scene = "primitive_village"
+        self.game_state = "exploring"
+        self.update_display()
+        self.show_scene_description()
+    
+    def sneak_past_creature(self):
+        """Successfully sneak past the creature"""
+        self.add_story_text("You find a hidden alcove with some useful items: a health potion and some gold coins.")
+        self.inventory.append('Health Potion')
+        self.gain_experience(10)
+        self.add_story_text("You gain 10 experience points for your stealthy approach.")
+        self.update_display()
+        self.show_scene_description()
+    
+    def search_alley_items(self):
+        """Search for items in the alley"""
+        self.add_story_text("You find some scattered coins and a rusty dagger. The dagger isn't very useful, but the coins might come in handy.")
+        self.inventory.append('Rusty Dagger')
+        self.gain_experience(5)
+        self.add_story_text("You gain 5 experience points for your thorough search.")
+        self.update_display()
+        self.show_scene_description()
+    
+    def find_chiefs_house_key(self):
+        """Find the chief's house key in the armory"""
+        self.add_story_text("You pick up the chief's house key. This ornate key should unlock the chief's house!")
+        self.inventory.append('Chief\'s House Key')
+        self.gain_experience(10)
+        self.add_story_text("You gain 10 experience points for finding the key.")
+        self.update_display()
+        self.show_scene_description()
+    
+    def access_armory_contents(self):
+        """Access armory contents when using the key"""
+        if 'Armory Key' in self.inventory:
+            self.add_story_text("You successfully unlock the armory storage! Inside you find:")
+            self.add_story_text("- A sturdy iron sword")
+            self.add_story_text("- Chain mail armor")
+            self.add_story_text("- A special key for the chief's house")
+            self.add_story_text("- Some gold coins")
+            
+            # Add items to inventory
+            self.inventory.extend(['Iron Sword', 'Chain Mail', 'Chief\'s House Key', 'Gold Coins'])
+            self.gain_experience(20)
+            self.add_story_text("You gain 20 experience points for successfully accessing the armory!")
+        else:
+            self.add_story_text("You don't have the armory key. You need to find it first.")
+            
+        self.update_display()
+        self.show_scene_description()
+    
+    def access_chiefs_house(self):
+        """Access chief's house when using the key"""
+        if 'Chief\'s House Key' in self.inventory:
+            self.add_story_text("You successfully enter the chief's house! The chief welcomes you and offers:")
+            self.add_story_text("- Guidance about the village's history")
+            self.add_story_text("- Information about the healing pool")
+            self.add_story_text("- A blessing that restores your health")
+            self.add_story_text("- Knowledge about the village's current troubles")
+            
+            # Restore health and gain experience
+            self.restore_health(50)
+            self.gain_experience(25)
+            self.add_story_text("The chief's blessing restores your health and you gain 25 experience points!")
+        else:
+            self.add_story_text("You don't have the chief's house key. You need to find it first.")
+            
+        self.update_display()
+        self.show_scene_description()
+        
+    def trigger_cave_in(self):
+        """Trigger the cave-in event"""
+        self.current_scene = "cave_in"
+        if "cave_in" not in self.visited_scenes:
+            self.visited_scenes.append("cave_in")
+        self.game_state = "exploring"
+        self.update_display()
+        self.show_scene_description()
+        
+    def advance_scene(self):
+        """Advance to the next scene in progression"""
+        current_index = self.scene_progression.index(self.current_scene)
+        if current_index < len(self.scene_progression) - 1:
+            # Add current scene to visited list if not already there
+            if self.current_scene not in self.visited_scenes:
+                self.visited_scenes.append(self.current_scene)
+            
+            self.current_scene = self.scene_progression[current_index + 1]
+            self.visited_scenes.append(self.current_scene)
+            self.game_state = "exploring"
+            self.add_story_text(f"You advance to {self.current_scene.replace('_', ' ').title()}.")
+            self.update_display()
+            # Show new scene description and choices automatically
+            self.show_scene_description()
+        else:
+            self.add_story_text("You have reached the end of your journey... for now.")
+            
+    def start_combat(self):
+        """Start a combat encounter"""
+        self.game_state = "in_combat"
+        self.add_story_text("A hostile creature appears! Combat begins!")
+        self.update_display()
+        
+        # Calculate combat effectiveness based on class and weapon
+        weapon_damage = self.weapons[self.player_weapon]['damage']
+        class_bonus = 0
+        
+        if self.player_character == 'warrior':
+            class_bonus = self.player_strength * 0.5
+        elif self.player_character == 'rogue':
+            class_bonus = self.player_agility * 0.3
+        elif self.player_character == 'mage':
+            class_bonus = self.player_intelligence * 0.4
+            
+        total_damage = weapon_damage + class_bonus
+        
+        # Combat resolution
+        if random.random() < 0.7:  # 70% chance to win
+            self.add_story_text(f"You defeat the enemy using your {self.player_weapon}! You gain experience.")
+            self.player_experience += 10
+            if self.player_experience >= 100:
+                self.level_up()
+        else:
+            damage_taken = max(10, random.randint(15, 25))
+            self.player_health = max(0, self.player_health - damage_taken)
+            self.add_story_text(f"You are wounded in combat! You take {damage_taken} damage.")
+            
+        self.game_state = "exploring"
+        self.update_display()
+        
+    def level_up(self):
+        """Level up the player"""
+        self.player_level += 1
+        self.player_experience = 0
+        self.player_health = self.classes[self.player_character]['health']  # Restore to max
+        self.add_story_text(f"Level up! You are now level {self.player_level}! Your {self.player_ability} has grown stronger!")
+        
+    def add_story_text(self, text):
+        """Add text to the story display"""
+        self.story_text.insert(tk.END, f"{text}\n\n")
+        self.story_text.see(tk.END)
+        
+    def add_story_text_top(self, text):
+        """Add text to the story display and scroll to top"""
+        self.story_text.insert(tk.END, f"{text}\n\n")
+        self.story_text.see("1.0")
+    
+    def add_story_text_compact(self, text):
+        """Add text to the story display with minimal spacing (for choice lists)"""
+        self.story_text.insert(tk.END, f"{text}\n")
+        self.story_text.see("1.0")
+        
+    def clear_story_text(self):
+        """Clear the story text display"""
+        self.story_text.delete(1.0, tk.END)
+    
+    def show_end_game_screen(self):
+        """Show the end game victory screen"""
+        # Clear the window
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        
+        # Create victory screen
+        victory_frame = tk.Frame(self.root, bg='#0a0a0a')
+        victory_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Title
+        title = tk.Label(victory_frame, text="VICTORY!", 
+                        font=('Arial', 48, 'bold'), fg='#ffdd00', bg='#0a0a0a')
+        title.pack(pady=50)
+        
+        # Victory message
+        msg_frame = tk.Frame(victory_frame, bg='#0a0a0a')
+        msg_frame.pack(pady=20)
+        
+        victory_text = [
+            "Congratulations, Hero!",
+            "",
+            f"You have completed SHABUYA Cave Adventure as a {self.classes[self.player_character]['name']}!",
+            "",
+            f"Final Level: {self.player_level}",
+            f"Total Experience: {self.player_experience}",
+            "",
+            "You have:",
+            "- Defeated the ancient evil Divine Heart",
+            "- Saved the primitive village from corruption", 
+            "- Become a legend among the people",
+            "",
+            "Thank you for playing!"
+        ]
+        
+        for line in victory_text:
+            label = tk.Label(msg_frame, text=line, 
+                           font=('Arial', 14), fg='#cccccc', bg='#0a0a0a')
+            label.pack()
+        
+        # Exit button
+        exit_btn = tk.Button(victory_frame, text="Exit Game", 
+                            command=self.root.quit,
+                            bg='#cc4444', fg='white', font=('Arial', 14, 'bold'),
+                            padx=30, pady=10)
+        exit_btn.pack(pady=30)
+        
+    def save_game(self):
+        """Save the current game state"""
+        # Placeholder for save functionality
+        self.add_story_text("Game saved! (Save functionality to be implemented)")
+        
+    def load_game(self):
+        """Load a saved game"""
+        # Placeholder for load functionality
+        self.add_story_text("Game loaded! (Load functionality to be implemented)")
+        
+    def handle_choice_input(self, event):
+        """Handle user input for choice selection with improved error handling"""
+        try:
+            choice_text = self.choice_entry.get().strip()
+            if not choice_text:
+                self.add_story_text("Please enter a choice.")
+                return
+                
+            choice_number = int(choice_text)
+            
+            # Check if player is in combat
+            if self.game_state == "in_combat":
+                self.handle_combat_action(choice_number)
+            else:
+                # Normal scene choice handling with validation
+                if self.current_scene not in self.scene_choices:
+                    self.add_story_text("No choices available in this scene.")
+                    return
+                    
+                choices = self.scene_choices[self.current_scene]
+                max_choices = len(choices)
+                
+                if 1 <= choice_number <= max_choices:
+                    self.execute_choice(choices[choice_number - 1], None)
+                else:
+                    self.add_story_text(f"Please enter a number between 1 and {max_choices}.")
+                    
+        except ValueError:
+            self.add_story_text("Please enter a valid number.")
+        except Exception as e:
+            self.add_story_text(f"An error occurred: {str(e)}")
+            print(f"Error in handle_choice_input: {e}")
+        finally:
+            self.choice_entry.delete(0, tk.END) # Clear the entry field
+        
+    def run(self):
+        """Start the GUI"""
+        print("Player GUI ready!")
+        self.root.mainloop()
+
+if __name__ == "__main__":
+    print("SHABUYA Cave Adventure - Player Mode")
+    print("=" * 50)
+    print("Linear gameplay experience")
+    print("Progressive story and exploration")
+    print("Character progression system")
+    print("=" * 50)
+    
+    gui = PlayerGameGUI()
+    gui.run()
